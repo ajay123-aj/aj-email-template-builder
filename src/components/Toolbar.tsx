@@ -62,7 +62,7 @@ export function Toolbar({ isMobile, leftDrawerOpen, rightDrawerOpen, onToggleLef
 
   return (
     <header className="min-h-12 flex-shrink-0 flex flex-wrap items-center gap-2 px-3 sm:px-4 py-2 bg-white border-b border-slate-200">
-      <span className="text-sm font-medium text-slate-700 mr-1">Email Template Builder</span>
+      <span className="text-sm font-medium text-slate-700 mr-1">AJ Email Template Builder</span>
       <div className="w-px h-5 sm:h-6 bg-slate-200" />
       {/* Blocks / Properties toggles only on mobile; desktop always shows both panels */}
       {isMobile && (
