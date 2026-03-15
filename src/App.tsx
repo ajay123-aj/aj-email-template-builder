@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import { Panel, PanelGroup } from 'react-resizable-panels';
@@ -10,6 +11,7 @@ import { PropertiesPanel } from './components/PropertiesPanel';
 import { BlockWrapper } from './components/blocks/BlockWrapper';
 import { useEditorStore, actions } from './store/useEditorStore';
 import { createBlock } from './blocks/blockRegistry';
+import { useMediaQuery } from './hooks/useMediaQuery';
 import type { BlockType } from './types/template';
 import type { AnyBlock } from './types/template';
 
@@ -33,6 +35,10 @@ export default function App() {
   const showPreview = useEditorStore(s => s.showPreview);
   const template = useEditorStore(s => s.template);
   const activeId = useEditorStore(s => s.dragActiveId);
+  // Desktop (>=1024px): Blocks & Properties visible by default in 3-panel layout. Mobile: hidden until user opens drawers.
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);   // mobile only: Blocks drawer closed by default
+  const [rightDrawerOpen, setRightDrawerOpen] = useState(false); // mobile only: Properties drawer closed by default
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
@@ -91,31 +97,84 @@ export default function App() {
 
   return (
     <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
-      <div className="h-screen flex flex-col bg-slate-100">
-        <Toolbar />
-        <PanelGroup direction="horizontal" className="flex-1 min-h-0">
-          <Panel defaultSize={18} minSize={12} maxSize={28} order={1}>
-            <div className="h-full bg-white border-r border-slate-200 overflow-hidden">
-              <BlockPalette />
-            </div>
-          </Panel>
-          <ResizeHandle />
-          <Panel defaultSize={52} minSize={30} order={2}>
-            <div className="h-full flex flex-col min-h-0">
+      <div className="h-screen flex flex-col bg-slate-100 min-h-0 overflow-hidden pb-14">
+        <Toolbar
+          isMobile={!isDesktop}
+          leftDrawerOpen={leftDrawerOpen}
+          rightDrawerOpen={rightDrawerOpen}
+          onToggleLeftDrawer={() => { setLeftDrawerOpen(o => !o); setRightDrawerOpen(false); }}
+          onToggleRightDrawer={() => { setRightDrawerOpen(o => !o); setLeftDrawerOpen(false); }}
+        />
+        {isDesktop ? (
+          /* Desktop: Blocks and Properties always visible by default in 3-panel layout */
+          <PanelGroup direction="horizontal" className="flex-1 min-h-0">
+            <Panel defaultSize={18} minSize={12} maxSize={28} order={1}>
+              <div className="h-full bg-white border-r border-slate-200 overflow-hidden">
+                <BlockPalette />
+              </div>
+            </Panel>
+            <ResizeHandle />
+            <Panel defaultSize={52} minSize={30} order={2}>
+              <div className="h-full flex flex-col min-h-0">
+                {showPreview ? <Preview /> : <Canvas />}
+              </div>
+            </Panel>
+            <ResizeHandle />
+            <Panel defaultSize={30} minSize={20} maxSize={40} order={3}>
+              <div className="h-full bg-white border-l border-slate-200 overflow-hidden">
+                <PropertiesPanel />
+              </div>
+            </Panel>
+          </PanelGroup>
+        ) : (
+          /* Mobile: Blocks and Properties hidden by default; open via toolbar "Blocks" / "Properties" */
+          <div className="flex-1 min-h-0 flex flex-col relative overflow-hidden">
+            <div className="flex-1 min-h-0 flex flex-col">
               {showPreview ? <Preview /> : <Canvas />}
             </div>
-          </Panel>
-          <ResizeHandle />
-          <Panel defaultSize={30} minSize={20} maxSize={40} order={3}>
-            <div className="h-full bg-white border-l border-slate-200 overflow-hidden">
-              <PropertiesPanel />
-            </div>
-          </Panel>
-        </PanelGroup>
+            {/* Mobile drawer: Blocks */}
+            {leftDrawerOpen && (
+              <>
+                <div className="fixed inset-0 bg-black/40 z-40 lg:hidden" onClick={() => setLeftDrawerOpen(false)} aria-hidden />
+                <aside className="fixed top-12 left-0 bottom-0 w-[min(280px,85vw)] bg-white border-r border-slate-200 shadow-xl z-50 flex flex-col lg:hidden">
+                  <div className="flex items-center justify-between px-3 py-2 border-b border-slate-200">
+                    <span className="text-sm font-semibold text-slate-800">Blocks</span>
+                    <button type="button" onClick={() => setLeftDrawerOpen(false)} className="p-2 rounded-lg hover:bg-slate-100 text-slate-600" aria-label="Close">✕</button>
+                  </div>
+                  <div className="flex-1 overflow-auto">
+                    <BlockPalette />
+                  </div>
+                </aside>
+              </>
+            )}
+            {/* Mobile drawer: Properties */}
+            {rightDrawerOpen && (
+              <>
+                <div className="fixed inset-0 bg-black/40 z-40 lg:hidden" onClick={() => setRightDrawerOpen(false)} aria-hidden />
+                <aside className="fixed top-12 right-0 bottom-0 w-[min(320px,85vw)] bg-white border-l border-slate-200 shadow-xl z-50 flex flex-col lg:hidden">
+                  <div className="flex items-center justify-between px-3 py-2 border-b border-slate-200">
+                    <span className="text-sm font-semibold text-slate-800">Properties</span>
+                    <button type="button" onClick={() => setRightDrawerOpen(false)} className="p-2 rounded-lg hover:bg-slate-100 text-slate-600" aria-label="Close">✕</button>
+                  </div>
+                  <div className="flex-1 overflow-auto">
+                    <PropertiesPanel />
+                  </div>
+                </aside>
+              </>
+            )}
+          </div>
+        )}
+        {/* Edit & Preview only - fixed at bottom, centered */}
+        <div className="fixed bottom-4 left-0 right-0 flex justify-center z-30 pointer-events-none">
+          <div className="pointer-events-auto inline-flex rounded-lg border border-slate-300 bg-slate-100 p-0.5 shadow-md">
+            <button type="button" onClick={() => actions.setShowPreview(false)} className={`px-4 sm:px-6 py-2 rounded-md text-sm font-medium cursor-pointer transition-colors ${!showPreview ? 'bg-white shadow-sm text-slate-800' : 'text-slate-600 hover:text-slate-800'}`}>Edit</button>
+            <button type="button" onClick={() => actions.setShowPreview(true)} className={`px-4 sm:px-6 py-2 rounded-md text-sm font-medium cursor-pointer transition-colors ${showPreview ? 'bg-white shadow-sm text-slate-800' : 'text-slate-600 hover:text-slate-800'}`}>Preview</button>
+          </div>
+        </div>
       </div>
       <DragOverlay>
         {overlayBlock ? (
-          <div className="w-80 rounded-lg border-2 border-blue-400 bg-white shadow-xl p-2 opacity-95">
+          <div className="w-80 max-w-[85vw] rounded-lg border-2 border-blue-400 bg-white shadow-xl p-2 opacity-95">
             <BlockWrapper block={overlayBlock} sectionId={overlaySectionId} columnId={overlayColumnId} index={0} isOverlay />
           </div>
         ) : null}

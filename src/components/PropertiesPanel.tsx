@@ -1,15 +1,123 @@
 import { useEditorStore, actions } from '../store/useEditorStore';
-import type { AnyBlock } from '../types/template';
+import type { AnyBlock, BackgroundType } from '../types/template';
+
+function TemplateBackgroundFields() {
+  const template = useEditorStore(s => s.template);
+  const type = template.backgroundType ?? 'color';
+  return (
+    <>
+      <div>
+        <label className="block text-xs text-slate-600 mb-1">Background type</label>
+        <select value={type} onChange={e => actions.setTemplateBackgroundType(e.target.value as BackgroundType)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300">
+          <option value="color">Plain color</option>
+          <option value="gradient">Linear gradient</option>
+          <option value="image">Image</option>
+        </select>
+      </div>
+      {type === 'color' && (
+        <div>
+          <label className="block text-xs text-slate-600 mb-1">Color</label>
+          <input type="color" value={template.backgroundColor || '#ffffff'} onChange={e => actions.setTemplateBackground(e.target.value)} className="w-full h-8 rounded border border-slate-300 cursor-pointer" />
+        </div>
+      )}
+      {type === 'gradient' && (
+        <>
+          <div>
+            <label className="block text-xs text-slate-600 mb-1">Angle (degrees)</label>
+            <input type="number" min={0} max={360} value={template.backgroundGradient?.angle ?? 90} onChange={e => actions.setTemplateBackgroundGradient({ ...template.backgroundGradient, angle: Number(e.target.value) })} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" />
+          </div>
+          <div>
+            <label className="block text-xs text-slate-600 mb-1">Colors (comma-separated hex)</label>
+            <input type="text" value={(template.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb']).join(', ')} onChange={e => actions.setTemplateBackgroundGradient({ ...template.backgroundGradient, colors: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="#ffffff, #e5e7eb" />
+          </div>
+        </>
+      )}
+      {type === 'image' && (
+        <>
+          <div>
+            <label className="block text-xs text-slate-600 mb-1">Image URL</label>
+            <input type="text" value={template.backgroundImageUrl ?? ''} onChange={e => actions.setTemplateBackgroundImage(e.target.value, template.backgroundImageSize, template.backgroundImagePosition)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="https://..." />
+          </div>
+          <div>
+            <label className="block text-xs text-slate-600 mb-1">Size</label>
+            <select value={template.backgroundImageSize ?? 'cover'} onChange={e => actions.setTemplateBackgroundImage(template.backgroundImageUrl ?? '', e.target.value as 'cover' | 'contain' | 'auto', template.backgroundImagePosition)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300">
+              <option value="cover">Cover</option>
+              <option value="contain">Contain</option>
+              <option value="auto">Auto</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs text-slate-600 mb-1">Position</label>
+            <input type="text" value={template.backgroundImagePosition ?? 'center'} onChange={e => actions.setTemplateBackgroundImage(template.backgroundImageUrl ?? '', template.backgroundImageSize, e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="center" />
+          </div>
+        </>
+      )}
+    </>
+  );
+}
+
+function SectionBackgroundFields({ sectionId }: { sectionId: string }) {
+  const section = useEditorStore(s => s.template.sections.find(x => x.id === sectionId));
+  if (!section) return null;
+  const type = section.backgroundType ?? 'color';
+  return (
+    <>
+      <div>
+        <label className="block text-xs text-slate-600 mb-1">Background type</label>
+        <select value={type} onChange={e => actions.setSectionBackgroundType(sectionId, e.target.value as BackgroundType)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300">
+          <option value="color">Plain color</option>
+          <option value="gradient">Linear gradient</option>
+          <option value="image">Image</option>
+        </select>
+      </div>
+      {type === 'color' && (
+        <div>
+          <label className="block text-xs text-slate-600 mb-1">Color</label>
+          <input type="color" value={section.backgroundColor ?? '#ffffff'} onChange={e => actions.setSectionBackground(sectionId, e.target.value)} className="w-full h-8 rounded border border-slate-300 cursor-pointer" />
+        </div>
+      )}
+      {type === 'gradient' && (
+        <>
+          <div>
+            <label className="block text-xs text-slate-600 mb-1">Angle (degrees)</label>
+            <input type="number" min={0} max={360} value={section.backgroundGradient?.angle ?? 90} onChange={e => actions.setSectionBackgroundGradient(sectionId, { ...section.backgroundGradient, angle: Number(e.target.value) })} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" />
+          </div>
+          <div>
+            <label className="block text-xs text-slate-600 mb-1">Colors (comma-separated hex)</label>
+            <input type="text" value={(section.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb']).join(', ')} onChange={e => actions.setSectionBackgroundGradient(sectionId, { ...section.backgroundGradient, colors: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="#ffffff, #e5e7eb" />
+          </div>
+        </>
+      )}
+      {type === 'image' && (
+        <>
+          <div>
+            <label className="block text-xs text-slate-600 mb-1">Image URL</label>
+            <input type="text" value={section.backgroundImageUrl ?? ''} onChange={e => actions.setSectionBackgroundImage(sectionId, e.target.value, section.backgroundImageSize, section.backgroundImagePosition)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="https://..." />
+          </div>
+          <div>
+            <label className="block text-xs text-slate-600 mb-1">Size</label>
+            <select value={section.backgroundImageSize ?? 'cover'} onChange={e => actions.setSectionBackgroundImage(sectionId, section.backgroundImageUrl ?? '', e.target.value as 'cover' | 'contain' | 'auto', section.backgroundImagePosition)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300">
+              <option value="cover">Cover</option>
+              <option value="contain">Contain</option>
+              <option value="auto">Auto</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs text-slate-600 mb-1">Position</label>
+            <input type="text" value={section.backgroundImagePosition ?? 'center'} onChange={e => actions.setSectionBackgroundImage(sectionId, section.backgroundImageUrl ?? '', section.backgroundImageSize, e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="center" />
+          </div>
+        </>
+      )}
+    </>
+  );
+}
 
 function TemplateProps() {
   const template = useEditorStore(s => s.template);
   return (
     <div className="p-3 space-y-3">
       <h3 className="text-sm font-semibold text-slate-800">Template</h3>
-      <div>
-        <label className="block text-xs text-slate-600 mb-1">Background</label>
-        <input type="color" value={template.backgroundColor || '#ffffff'} onChange={e => actions.setTemplateBackground(e.target.value)} className="w-full h-8 rounded border border-slate-300 cursor-pointer" />
-      </div>
+      <TemplateBackgroundFields />
       <div>
         <label className="block text-xs text-slate-600 mb-1">Width</label>
         <input type="text" value={template.width || '600px'} onChange={e => actions.setTemplateWidth(e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="600px" />
@@ -28,10 +136,7 @@ function SectionProps({ sectionId }: { sectionId: string }) {
         <label className="block text-xs text-slate-600 mb-1">Padding</label>
         <input type="text" value={section.padding ?? ''} onChange={e => actions.setSectionPadding(sectionId, e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="16px" />
       </div>
-      <div>
-        <label className="block text-xs text-slate-600 mb-1">Background</label>
-        <input type="color" value={section.backgroundColor ?? '#ffffff'} onChange={e => actions.setSectionBackground(sectionId, e.target.value)} className="w-full h-8 rounded border border-slate-300 cursor-pointer" />
-      </div>
+      <SectionBackgroundFields sectionId={sectionId} />
     </div>
   );
 }

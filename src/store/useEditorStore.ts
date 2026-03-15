@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { v4 as uuid } from 'uuid';
-import type { AnyBlock, EmailColumn, EmailSection, EmailTemplate, SectionLayout } from '../types/template';
+import type { AnyBlock, EmailColumn, EmailSection, EmailTemplate, SectionLayout, BackgroundType, BackgroundGradient } from '../types/template';
 
 const createColumn = (): EmailColumn => ({ id: uuid(), width: '100%', blocks: [] });
 const createSection = (n: number, layout: SectionLayout = 'row'): EmailSection => {
@@ -11,7 +11,7 @@ const createSection = (n: number, layout: SectionLayout = 'row'): EmailSection =
   });
   return { id: uuid(), layout, columns: cols };
 };
-const emptyTemplate = (): EmailTemplate => ({ id: uuid(), name: 'Untitled', width: '600px', backgroundColor: '#ffffff', sections: [createSection(1)] });
+const emptyTemplate = (): EmailTemplate => ({ id: uuid(), name: 'Untitled', width: '600px', backgroundType: 'color', backgroundColor: '#ffffff', sections: [createSection(1)] });
 
 interface State {
   template: EmailTemplate;
@@ -58,7 +58,10 @@ export const actions = {
   selectSection: (id: string | null) => setState({ selectedSectionId: id }),
   setShowPreview: (v: boolean) => setState({ showPreview: v }),
   setDragActiveId: (id: string | null) => setState({ dragActiveId: id }),
-  setTemplateBackground: (c: string) => setState({ template: { ...getState().template, backgroundColor: c } }),
+  setTemplateBackground: (c: string) => setState({ template: { ...getState().template, backgroundType: 'color', backgroundColor: c } }),
+  setTemplateBackgroundType: (t: BackgroundType) => setState({ template: { ...getState().template, backgroundType: t } }),
+  setTemplateBackgroundGradient: (g: BackgroundGradient) => setState({ template: { ...getState().template, backgroundType: 'gradient', backgroundGradient: { angle: g.angle ?? 90, colors: g.colors?.length ? g.colors : ['#ffffff', '#e5e7eb'] } } }),
+  setTemplateBackgroundImage: (url: string, size?: 'cover' | 'contain' | 'auto', position?: string) => setState({ template: { ...getState().template, backgroundType: 'image', backgroundImageUrl: url, backgroundImageSize: size, backgroundImagePosition: position } }),
   setTemplateWidth: (w: string) => setState({ template: { ...getState().template, width: w } }),
   addSection: (n: number, layout: SectionLayout = 'row') => {
     actions.pushHistory();
@@ -85,7 +88,10 @@ export const actions = {
     setState({ template: { ...template, sections: template.sections.map(s => s.id === sectionId ? { ...s, layout } : s) } });
   },
   setSectionPadding: (sectionId: string, padding: string) => setState({ template: { ...getState().template, sections: getState().template.sections.map(s => s.id === sectionId ? { ...s, padding } : s) } }),
-  setSectionBackground: (sectionId: string, backgroundColor: string) => setState({ template: { ...getState().template, sections: getState().template.sections.map(s => s.id === sectionId ? { ...s, backgroundColor } : s) } }),
+  setSectionBackground: (sectionId: string, backgroundColor: string) => setState({ template: { ...getState().template, sections: getState().template.sections.map(s => s.id === sectionId ? { ...s, backgroundType: 'color', backgroundColor } : s) } }),
+  setSectionBackgroundType: (sectionId: string, t: BackgroundType) => setState({ template: { ...getState().template, sections: getState().template.sections.map(s => s.id === sectionId ? { ...s, backgroundType: t } : s) } }),
+  setSectionBackgroundGradient: (sectionId: string, g: BackgroundGradient) => setState({ template: { ...getState().template, sections: getState().template.sections.map(s => s.id === sectionId ? { ...s, backgroundType: 'gradient', backgroundGradient: { angle: g.angle ?? 90, colors: g.colors?.length ? g.colors : ['#ffffff', '#e5e7eb'] } } : s) } }),
+  setSectionBackgroundImage: (sectionId: string, url: string, size?: 'cover' | 'contain' | 'auto', position?: string) => setState({ template: { ...getState().template, sections: getState().template.sections.map(s => s.id === sectionId ? { ...s, backgroundType: 'image', backgroundImageUrl: url, backgroundImageSize: size, backgroundImagePosition: position } : s) } }),
   addBlock: (sectionId: string, columnId: string, index: number, block: AnyBlock) => {
     actions.pushHistory();
     const { template } = getState();

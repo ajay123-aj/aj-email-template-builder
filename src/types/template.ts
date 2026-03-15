@@ -27,5 +27,20 @@ export interface HtmlConfig { html: string; }
 export type AnyBlock = BaseBlock<'text', TextConfig> | BaseBlock<'heading', HeadingConfig> | BaseBlock<'image', ImageConfig> | BaseBlock<'button', ButtonConfig> | BaseBlock<'divider', DividerConfig> | BaseBlock<'spacer', SpacerConfig> | BaseBlock<'social', SocialConfig> | BaseBlock<'columns', ColumnsConfig> | BaseBlock<'header', HeaderConfig> | BaseBlock<'footer', FooterConfig> | BaseBlock<'html', HtmlConfig>;
 export interface EmailColumn { id: string; width?: string; blocks: AnyBlock[]; }
 export type SectionLayout = 'row' | 'column';
-export interface EmailSection { id: string; layout?: SectionLayout; backgroundColor?: string; padding?: string; columns: EmailColumn[]; }
-export interface EmailTemplate { id: string; name?: string; width?: string; backgroundColor?: string; sections: EmailSection[]; }
+
+export type BackgroundType = 'color' | 'gradient' | 'image';
+export interface BackgroundGradient {
+  angle?: number;  // degrees, 0 = to top, 90 = to right
+  colors?: string[];  // hex or named colors
+}
+export interface BackgroundOptions {
+  backgroundType?: BackgroundType;
+  backgroundColor?: string;
+  backgroundGradient?: BackgroundGradient;
+  backgroundImageUrl?: string;
+  backgroundImageSize?: 'cover' | 'contain' | 'auto';
+  backgroundImagePosition?: string;
+}
+
+export interface EmailSection extends BackgroundOptions { id: string; layout?: SectionLayout; padding?: string; columns: EmailColumn[]; }
+export interface EmailTemplate extends BackgroundOptions { id: string; name?: string; width?: string; sections: EmailSection[]; }

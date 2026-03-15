@@ -1,4 +1,5 @@
 import type { EmailTemplate, AnyBlock } from '../types/template';
+import { getBackgroundStyle } from './backgroundStyle';
 
 function esc(s: string) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
@@ -39,11 +40,11 @@ function colHtml(blocks: AnyBlock[]) { return blocks.map(blockHtml).join(''); }
 
 export function exportToEmailHtml(template: EmailTemplate): string {
   const w = template.width ?? '600';
-  const bg = template.backgroundColor ?? '#ffffff';
+  const bg = getBackgroundStyle(template);
   const rows = template.sections.map(section => {
     const layout = section.layout ?? 'row';
     const pad = section.padding ?? '16px';
-    const sbg = section.backgroundColor ?? 'transparent';
+    const sbg = getBackgroundStyle(section);
     if (section.columns.length === 0) return '';
     if (layout === 'column' || section.columns.length === 1) {
       return `<tr><td style="padding:${pad};background:${sbg}"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td>${section.columns.map(c => colHtml(c.blocks)).join('')}</td></tr></table></td></tr>`;
