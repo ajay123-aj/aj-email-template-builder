@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useEditorStore, actions } from '../store/useEditorStore';
+import { actions } from '../store/useEditorStore';
 import { generateTemplateFromAI } from '../utils/aiTemplate';
 
 const DEFAULT_PROMPT = 'Create a colorful welcome email: header with logo image and colored background, a hero/banner image, short intro text, one CTA button, and a footer. Use vibrant colors and include template-related images so the preview looks complete.';
