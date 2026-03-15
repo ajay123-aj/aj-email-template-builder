@@ -16,7 +16,8 @@ function PaletteItem({ type }: { type: BlockType }) {
 export function BlockPalette() {
   return (
     <div className="p-3 h-full overflow-y-auto">
-      <h3 className="text-sm font-semibold text-slate-800 mb-3">Blocks</h3>
+      <h3 className="text-sm font-semibold text-slate-800 mb-1">Blocks</h3>
+      <p className="text-xs text-slate-500 mb-3">Drag a block into the canvas to add it to your email template.</p>
       <div className="flex flex-col gap-2">
         {PALETTE_ORDER.map(type => <PaletteItem key={type} type={type} />)}
       </div>

@@ -2,6 +2,14 @@ import type { AnyBlock } from '../../types/template';
 
 interface Props { block: AnyBlock; selected?: boolean; onPatch: (id: string, config: Record<string, unknown>) => void; }
 
+// Show line breaks in editor: normalize \n and <br> to visual line breaks; on blur we save innerText (with \n).
+function contentWithLineBreaks(content: string | undefined, fallback: string) {
+  const raw = (content ?? fallback).trim() || fallback;
+  const normalized = raw.replace(/<br\s*\/?>/gi, '\n');
+  const parts = normalized.split('\n');
+  return parts.flatMap((segment, i) => (i < parts.length - 1 ? [segment, <br key={i} />] : [segment]));
+}
+
 export function BlockRenderer({ block, selected, onPatch }: Props) {
   const c = block.config as Record<string, unknown>;
   const onBlur = (e: React.FocusEvent<HTMLElement>, key: string) => onPatch(block.id, { ...c, [key]: (e.target as HTMLElement).innerText ?? '' });
@@ -10,16 +18,16 @@ export function BlockRenderer({ block, selected, onPatch }: Props) {
     case 'text':
       return (
         <div contentEditable={selected} suppressContentEditableWarning className="outline-none whitespace-pre-wrap break-words min-h-[1.5em]"
-          style={{ fontSize: (c.fontSize as string) ?? '14px', color: (c.color as string) ?? '#374151', textAlign: ((c.alignment as string) ?? 'left') as React.CSSProperties['textAlign'], fontFamily: (c.fontFamily as string) ?? 'inherit', fontWeight: (c.fontWeight as string) === 'bold' ? 'bold' : 'normal', fontStyle: (c.fontStyle as string) === 'italic' ? 'italic' : 'normal', padding: (c.padding as string) || undefined, backgroundColor: (c.backgroundColor as string) || undefined }}
-          onBlur={e => onBlur(e, 'content')}>{(c.content as string) ?? 'Edit text'}</div>
+          style={{ fontSize: (c.fontSize as string) ?? '14px', color: (c.color as string) ?? '#374151', textAlign: ((c.alignment as string) ?? 'left') as React.CSSProperties['textAlign'], fontFamily: (c.fontFamily as string) ?? 'Arial, Helvetica, sans-serif', fontWeight: (c.fontWeight as string) === 'bold' ? 'bold' : 'normal', fontStyle: (c.fontStyle as string) === 'italic' ? 'italic' : 'normal', padding: (c.padding as string) || undefined, backgroundColor: (c.backgroundColor as string) || undefined }}
+          onBlur={e => onBlur(e, 'content')}>{contentWithLineBreaks(c.content as string, 'Edit text')}</div>
       );
     case 'heading': {
       const level = ((c.level as number) ?? 2) as 1 | 2 | 3 | 4;
       const Tag = `h${level}` as keyof JSX.IntrinsicElements;
       return (
         <Tag contentEditable={selected} suppressContentEditableWarning className="outline-none break-words min-h-[1em]"
-          style={{ fontSize: (c.fontSize as string) ?? '24px', color: (c.color as string) ?? '#111827', textAlign: ((c.alignment as string) ?? 'left') as React.CSSProperties['textAlign'], fontFamily: (c.fontFamily as string) ?? 'inherit', fontWeight: (c.fontWeight as string) === 'bold' ? 'bold' : 'normal', fontStyle: (c.fontStyle as string) === 'italic' ? 'italic' : 'normal', margin: 0 }}
-          onBlur={e => onBlur(e as React.FocusEvent<HTMLElement>, 'content')}>{(c.content as string) ?? 'Heading'}</Tag>
+          style={{ fontSize: (c.fontSize as string) ?? '24px', color: (c.color as string) ?? '#111827', textAlign: ((c.alignment as string) ?? 'left') as React.CSSProperties['textAlign'], fontFamily: (c.fontFamily as string) ?? 'Arial, Helvetica, sans-serif', fontWeight: (c.fontWeight as string) === 'bold' ? 'bold' : 'normal', fontStyle: (c.fontStyle as string) === 'italic' ? 'italic' : 'normal', margin: 0 }}
+          onBlur={e => onBlur(e as React.FocusEvent<HTMLElement>, 'content')}>{contentWithLineBreaks(c.content as string, 'Heading')}</Tag>
       );
     }
     case 'image':
@@ -45,11 +53,11 @@ export function BlockRenderer({ block, selected, onPatch }: Props) {
       return (
         <div style={{ padding: (c.padding as string) ?? '16px', backgroundColor: (c.backgroundColor as string) ?? '#f9fafb', minHeight: (c.height as string) ?? '60px', display: 'flex', alignItems: 'center', gap: '12px' }}>
           {(c.logoUrl as string) && <img src={c.logoUrl as string} alt={(c.logoAlt as string) || 'Logo'} style={{ maxHeight: '48px', width: 'auto' }} draggable={false} />}
-          <div contentEditable={selected} suppressContentEditableWarning className="outline-none flex-1" style={{ fontSize: (c.fontSize as string) ?? '28px', color: (c.color as string) ?? '#111827', fontWeight: (c.fontWeight as string) === 'bold' ? 'bold' : 'normal' }} onBlur={e => onBlur(e as React.FocusEvent<HTMLElement>, 'content')}>{(c.content as string) ?? 'Header'}</div>
+          <div contentEditable={selected} suppressContentEditableWarning className="outline-none flex-1" style={{ fontSize: (c.fontSize as string) ?? '28px', color: (c.color as string) ?? '#111827', fontFamily: (c.fontFamily as string) ?? 'Arial, Helvetica, sans-serif', fontWeight: (c.fontWeight as string) === 'bold' ? 'bold' : 'normal' }} onBlur={e => onBlur(e as React.FocusEvent<HTMLElement>, 'content')}>{contentWithLineBreaks(c.content as string, 'Header')}</div>
         </div>
       );
     case 'footer':
-      return <div style={{ padding: (c.padding as string) ?? '16px', backgroundColor: (c.backgroundColor as string) ?? '#f3f4f6', fontSize: (c.fontSize as string) ?? '12px', color: (c.color as string) ?? '#6b7280', textAlign: 'center' }}>{(c.content as string) ?? '© Footer'}</div>;
+      return <div style={{ padding: (c.padding as string) ?? '16px', backgroundColor: (c.backgroundColor as string) ?? '#f3f4f6', fontSize: (c.fontSize as string) ?? '12px', color: (c.color as string) ?? '#6b7280', fontFamily: (c.fontFamily as string) ?? 'Arial, Helvetica, sans-serif', textAlign: 'center' }}>{contentWithLineBreaks(c.content as string, '© Footer')}</div>;
     case 'html':
       return <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: (c.html as string) ?? '' }} />;
     default:

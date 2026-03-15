@@ -8,6 +8,7 @@ import { BlockPalette } from './components/BlockPalette';
 import { Canvas } from './components/Canvas';
 import { Preview } from './components/Preview';
 import { PropertiesPanel } from './components/PropertiesPanel';
+import { AskAIModal } from './components/AskAIModal';
 import { BlockWrapper } from './components/blocks/BlockWrapper';
 import { useEditorStore, actions } from './store/useEditorStore';
 import { createBlock } from './blocks/blockRegistry';
@@ -39,6 +40,11 @@ export default function App() {
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);   // mobile only: Blocks drawer closed by default
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false); // mobile only: Properties drawer closed by default
+  const [askAIOpen, setAskAIOpen] = useState(false);
+  const askAIEnabled = (() => {
+    const v = (import.meta.env.VITE_ASK_AI_ENABLED as string | undefined) ?? '';
+    return ['true', '1', 'on'].includes(String(v).toLowerCase());
+  })();
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
@@ -97,7 +103,7 @@ export default function App() {
 
   return (
     <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
-      <div className="h-screen flex flex-col bg-slate-100 min-h-0 overflow-hidden pb-14">
+      <div className="h-screen flex flex-col bg-slate-100 min-h-0 overflow-hidden">
         <Toolbar
           isMobile={!isDesktop}
           leftDrawerOpen={leftDrawerOpen}
@@ -164,13 +170,15 @@ export default function App() {
             )}
           </div>
         )}
-        {/* Edit & Preview only - fixed at bottom, centered */}
+        {/* Fixed Edit / Preview / Ask AI */}
         <div className="fixed bottom-4 left-0 right-0 flex justify-center z-30 pointer-events-none">
           <div className="pointer-events-auto inline-flex rounded-lg border border-slate-300 bg-slate-100 p-0.5 shadow-md">
             <button type="button" onClick={() => actions.setShowPreview(false)} className={`px-4 sm:px-6 py-2 rounded-md text-sm font-medium cursor-pointer transition-colors ${!showPreview ? 'bg-white shadow-sm text-slate-800' : 'text-slate-600 hover:text-slate-800'}`}>Edit</button>
             <button type="button" onClick={() => actions.setShowPreview(true)} className={`px-4 sm:px-6 py-2 rounded-md text-sm font-medium cursor-pointer transition-colors ${showPreview ? 'bg-white shadow-sm text-slate-800' : 'text-slate-600 hover:text-slate-800'}`}>Preview</button>
+            {askAIEnabled && <button type="button" onClick={() => setAskAIOpen(true)} className="px-4 sm:px-6 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-200/80 transition-colors">Ask AI</button>}
           </div>
         </div>
+        {askAIEnabled && askAIOpen && <AskAIModal onClose={() => setAskAIOpen(false)} />}
       </div>
       <DragOverlay>
         {overlayBlock ? (

@@ -27,8 +27,17 @@ function TemplateBackgroundFields() {
             <input type="number" min={0} max={360} value={template.backgroundGradient?.angle ?? 90} onChange={e => actions.setTemplateBackgroundGradient({ ...template.backgroundGradient, angle: Number(e.target.value) })} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" />
           </div>
           <div>
-            <label className="block text-xs text-slate-600 mb-1">Colors (comma-separated hex)</label>
-            <input type="text" value={(template.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb']).join(', ')} onChange={e => actions.setTemplateBackgroundGradient({ ...template.backgroundGradient, colors: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="#ffffff, #e5e7eb" />
+            <label className="block text-xs text-slate-600 mb-1">Gradient colors</label>
+            {(template.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb']).map((color, i) => (
+              <div key={i} className="flex items-center gap-2 mb-2">
+                <input type="color" value={color.startsWith('#') && color.length >= 4 ? color : '#ffffff'} onChange={e => { const c = [...(template.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb'])]; c[i] = e.target.value; actions.setTemplateBackgroundGradient({ ...template.backgroundGradient, colors: c }); }} className="h-8 w-10 rounded border border-slate-300 cursor-pointer flex-shrink-0" />
+                <input type="text" value={color} onChange={e => { const c = [...(template.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb'])]; c[i] = e.target.value; actions.setTemplateBackgroundGradient({ ...template.backgroundGradient, colors: c }); }} className="flex-1 px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="#hex or name" />
+                {(template.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb']).length > 2 && (
+                  <button type="button" onClick={() => { const c = (template.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb']).filter((_, j) => j !== i); actions.setTemplateBackgroundGradient({ ...template.backgroundGradient, colors: c }); }} className="p-1.5 rounded text-slate-500 hover:bg-slate-200 hover:text-slate-700" aria-label="Remove color">×</button>
+                )}
+              </div>
+            ))}
+            <button type="button" onClick={() => { const cur = template.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb']; const last = cur[cur.length - 1] ?? '#e5e7eb'; actions.setTemplateBackgroundGradient({ ...template.backgroundGradient, colors: [...cur, last] }); }} className="mt-1 text-xs text-slate-600 hover:text-slate-800 border border-slate-300 rounded px-2 py-1">+ Add color</button>
           </div>
         </>
       )}
@@ -83,8 +92,17 @@ function SectionBackgroundFields({ sectionId }: { sectionId: string }) {
             <input type="number" min={0} max={360} value={section.backgroundGradient?.angle ?? 90} onChange={e => actions.setSectionBackgroundGradient(sectionId, { ...section.backgroundGradient, angle: Number(e.target.value) })} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" />
           </div>
           <div>
-            <label className="block text-xs text-slate-600 mb-1">Colors (comma-separated hex)</label>
-            <input type="text" value={(section.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb']).join(', ')} onChange={e => actions.setSectionBackgroundGradient(sectionId, { ...section.backgroundGradient, colors: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="#ffffff, #e5e7eb" />
+            <label className="block text-xs text-slate-600 mb-1">Gradient colors</label>
+            {(section.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb']).map((color, i) => (
+              <div key={i} className="flex items-center gap-2 mb-2">
+                <input type="color" value={color.startsWith('#') && color.length >= 4 ? color : '#ffffff'} onChange={e => { const c = [...(section.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb'])]; c[i] = e.target.value; actions.setSectionBackgroundGradient(sectionId, { ...section.backgroundGradient, colors: c }); }} className="h-8 w-10 rounded border border-slate-300 cursor-pointer flex-shrink-0" />
+                <input type="text" value={color} onChange={e => { const c = [...(section.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb'])]; c[i] = e.target.value; actions.setSectionBackgroundGradient(sectionId, { ...section.backgroundGradient, colors: c }); }} className="flex-1 px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="#hex or name" />
+                {(section.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb']).length > 2 && (
+                  <button type="button" onClick={() => { const c = (section.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb']).filter((_, j) => j !== i); actions.setSectionBackgroundGradient(sectionId, { ...section.backgroundGradient, colors: c }); }} className="p-1.5 rounded text-slate-500 hover:bg-slate-200 hover:text-slate-700" aria-label="Remove color">×</button>
+                )}
+              </div>
+            ))}
+            <button type="button" onClick={() => { const cur = section.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb']; const last = cur[cur.length - 1] ?? '#e5e7eb'; actions.setSectionBackgroundGradient(sectionId, { ...section.backgroundGradient, colors: [...cur, last] }); }} className="mt-1 text-xs text-slate-600 hover:text-slate-800 border border-slate-300 rounded px-2 py-1">+ Add color</button>
           </div>
         </>
       )}
@@ -117,10 +135,15 @@ function TemplateProps() {
   return (
     <div className="p-3 space-y-3">
       <h3 className="text-sm font-semibold text-slate-800">Template</h3>
+      <p className="text-xs text-slate-500">Width, padding, and background for the whole email.</p>
       <TemplateBackgroundFields />
       <div>
         <label className="block text-xs text-slate-600 mb-1">Width</label>
         <input type="text" value={template.width || '600px'} onChange={e => actions.setTemplateWidth(e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="600px" />
+      </div>
+      <div>
+        <label className="block text-xs text-slate-600 mb-1">Main padding</label>
+        <input type="text" value={template.padding ?? '24px'} onChange={e => actions.setTemplatePadding(e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="24px" />
       </div>
     </div>
   );
@@ -129,14 +152,40 @@ function TemplateProps() {
 function SectionProps({ sectionId }: { sectionId: string }) {
   const section = useEditorStore(s => s.template.sections.find(x => x.id === sectionId));
   if (!section) return null;
+  const multiColumn = section.columns.length > 1;
   return (
     <div className="p-3 space-y-3">
-      <h3 className="text-sm font-semibold text-slate-800">Section</h3>
+      <h3 className="text-sm font-semibold text-slate-800">Section options</h3>
+      <p className="text-xs text-slate-500">Change this row: layout, padding, background, columns.</p>
+      <div>
+        <label className="block text-xs text-slate-600 mb-1">Layout</label>
+        <div className="flex gap-2">
+          <button type="button" onClick={() => actions.setSectionLayout(sectionId, 'row')} className={`px-3 py-1.5 text-sm rounded border ${(section.layout ?? 'row') === 'row' ? 'border-blue-500 bg-blue-50 text-blue-800' : 'border-slate-300 bg-white'}`}>Row</button>
+          <button type="button" onClick={() => actions.setSectionLayout(sectionId, 'column')} className={`px-3 py-1.5 text-sm rounded border ${section.layout === 'column' ? 'border-blue-500 bg-blue-50 text-blue-800' : 'border-slate-300 bg-white'}`}>Column</button>
+        </div>
+      </div>
       <div>
         <label className="block text-xs text-slate-600 mb-1">Padding</label>
         <input type="text" value={section.padding ?? ''} onChange={e => actions.setSectionPadding(sectionId, e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="16px" />
       </div>
       <SectionBackgroundFields sectionId={sectionId} />
+      {multiColumn && (
+        <div>
+          <label className="block text-xs text-slate-600 mb-1">Column widths</label>
+          <div className="space-y-2">
+            {section.columns.map((col, i) => (
+              <div key={col.id} className="flex items-center gap-2">
+                <span className="text-xs text-slate-500 w-8">Col {i + 1}</span>
+                <input type="text" value={col.width ?? ''} onChange={e => actions.setColumnWidth(sectionId, col.id, e.target.value)} className="flex-1 px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="e.g. 50%" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-200">
+        <button type="button" onClick={() => actions.addColumnToSection(sectionId)} className="px-3 py-1.5 text-sm rounded border border-slate-300 bg-white hover:bg-slate-50">+ Add column</button>
+        <button type="button" onClick={() => { if (window.confirm('Remove this section?')) actions.removeSection(sectionId); }} className="px-3 py-1.5 text-sm rounded border border-red-200 text-red-700 hover:bg-red-50">Remove section</button>
+      </div>
     </div>
   );
 }
@@ -168,6 +217,18 @@ function BlockProps({ block }: { block: AnyBlock }) {
       <div>
         <label className="block text-xs text-slate-600 mb-1">Font family</label>
         <input type="text" value={String(c.fontFamily ?? '')} onChange={e => update('fontFamily', e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="inherit" />
+      </div>
+      <div>
+        <label className="block text-xs text-slate-600 mb-1">Line height</label>
+        <input type="text" value={String(c.lineHeight ?? '')} onChange={e => update('lineHeight', e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="1.5" />
+      </div>
+      <div>
+        <label className="block text-xs text-slate-600 mb-1">Padding</label>
+        <input type="text" value={String(c.padding ?? '')} onChange={e => update('padding', e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="0 or 8px" />
+      </div>
+      <div>
+        <label className="block text-xs text-slate-600 mb-1">Margin</label>
+        <input type="text" value={String(c.margin ?? '')} onChange={e => update('margin', e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="0 0 12px" />
       </div>
       <div>
         <label className="block text-xs text-slate-600 mb-1">Background</label>
@@ -236,6 +297,10 @@ function BlockProps({ block }: { block: AnyBlock }) {
             <input type="text" value={String(c.href ?? '')} onChange={e => update('href', e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" />
           </div>
           <div>
+            <label className="block text-xs text-slate-600 mb-1">Padding</label>
+            <input type="text" value={String(c.padding ?? '12px 24px')} onChange={e => update('padding', e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="12px 24px" />
+          </div>
+          <div>
             <label className="block text-xs text-slate-600 mb-1">Background</label>
             <input type="color" value={String(c.backgroundColor ?? '#3b82f6')} onChange={e => update('backgroundColor', e.target.value)} className="w-full h-8 rounded border border-slate-300 cursor-pointer" />
           </div>
@@ -249,6 +314,8 @@ function BlockProps({ block }: { block: AnyBlock }) {
         <>
           <div><label className="block text-xs text-slate-600 mb-1">Border color</label><input type="color" value={String(c.borderColor ?? '#e5e7eb')} onChange={e => update('borderColor', e.target.value)} className="w-full h-8 rounded border border-slate-300 cursor-pointer" /></div>
           <div><label className="block text-xs text-slate-600 mb-1">Border width</label><input type="text" value={String(c.borderWidth ?? '1px')} onChange={e => update('borderWidth', e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" /></div>
+          <div><label className="block text-xs text-slate-600 mb-1">Margin</label><input type="text" value={String(c.margin ?? '16px 0')} onChange={e => update('margin', e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="16px 0" /></div>
+          <div><label className="block text-xs text-slate-600 mb-1">Width</label><input type="text" value={String(c.width ?? '100%')} onChange={e => update('width', e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-300" placeholder="100%" /></div>
         </>
       )}
       {block.type === 'spacer' && (

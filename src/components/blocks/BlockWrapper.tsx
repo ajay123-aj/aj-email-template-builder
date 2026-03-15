@@ -17,15 +17,15 @@ export function BlockWrapper({ block, sectionId, columnId, index, isOverlay }: P
 
   return (
     <div ref={setNodeRef} style={style} onClick={e => { e.stopPropagation(); actions.selectBlock(block.id); actions.selectSection(sectionId); }}
-      className={`relative rounded border-2 transition-colors ${selected ? 'border-blue-500 bg-blue-50/30' : 'border-transparent hover:border-slate-300 bg-white'} ${isDragging ? 'opacity-80 shadow-lg z-50' : ''}`}>
+      className={`relative rounded transition-all group ${selected ? 'ring-2 ring-blue-500 ring-offset-1' : 'ring-2 ring-transparent ring-offset-1 hover:ring-slate-300'} ${isDragging ? 'opacity-80 shadow-lg z-50' : ''}`}>
       {!isOverlay && (
-        <div className="absolute -top-8 left-0 right-0 flex items-center gap-1 opacity-0 hover:opacity-100">
-          <button type="button" className="px-2 py-1 text-xs rounded bg-slate-700 text-white" {...listeners} {...attributes} title="Drag">⋮⋮</button>
-          <button type="button" className="px-2 py-1 text-xs rounded bg-slate-600 text-white" onClick={e => { e.stopPropagation(); actions.duplicateBlock(block.id); }}>Copy</button>
-          <button type="button" className="px-2 py-1 text-xs rounded bg-red-600 text-white" onClick={e => { e.stopPropagation(); actions.deleteBlock(block.id); }}>×</button>
+        <div className="absolute top-1 right-1 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 z-10">
+          <button type="button" className="px-1.5 py-0.5 text-xs rounded bg-slate-700/90 text-white shadow hover:bg-slate-600" {...listeners} {...attributes} title="Drag">⋮⋮</button>
+          <button type="button" className="px-1.5 py-0.5 text-xs rounded bg-slate-600/90 text-white hover:bg-slate-500" onClick={e => { e.stopPropagation(); actions.duplicateBlock(block.id); }}>Copy</button>
+          <button type="button" className="px-1.5 py-0.5 text-xs rounded bg-red-600/90 text-white hover:bg-red-500" onClick={e => { e.stopPropagation(); actions.deleteBlock(block.id); }}>×</button>
         </div>
       )}
-      <div className="p-2 min-h-[24px]"><BlockRenderer block={block} selected={selected} onPatch={onPatch} /></div>
+      <div className={`min-h-[24px] ${!isOverlay ? 'p-1' : 'p-2'}`}><BlockRenderer block={block} selected={selected} onPatch={onPatch} /></div>
     </div>
   );
 }

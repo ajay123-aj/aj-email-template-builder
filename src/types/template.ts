@@ -43,4 +43,4 @@ export interface BackgroundOptions {
 }
 
 export interface EmailSection extends BackgroundOptions { id: string; layout?: SectionLayout; padding?: string; columns: EmailColumn[]; }
-export interface EmailTemplate extends BackgroundOptions { id: string; name?: string; width?: string; sections: EmailSection[]; }
+export interface EmailTemplate extends BackgroundOptions { id: string; name?: string; width?: string; padding?: string; sections: EmailSection[]; }
