@@ -21,6 +21,8 @@ interface State {
   historyIndex: number;
   showPreview: boolean;
   dragActiveId: string | null;
+  dragOverId: string | null;
+  dragOverPosition: 'top' | 'bottom' | null;
 }
 const getState = () => useEditorStore.getState();
 const setState = (s: Partial<State>) => useEditorStore.setState(s);
@@ -33,6 +35,8 @@ export const useEditorStore = create<State>(() => ({
   historyIndex: 0,
   showPreview: false,
   dragActiveId: null,
+  dragOverId: null,
+  dragOverPosition: null,
 }));
 
 export const actions = {
@@ -68,6 +72,7 @@ export const actions = {
   selectSection: (id: string | null) => setState({ selectedSectionId: id }),
   setShowPreview: (v: boolean) => setState({ showPreview: v }),
   setDragActiveId: (id: string | null) => setState({ dragActiveId: id }),
+  setDragOver: (id: string | null, position: 'top' | 'bottom' | null) => setState({ dragOverId: id, dragOverPosition: position }),
   setTemplateBackground: (c: string) => { actions.pushHistory(); setState({ template: { ...getState().template, backgroundType: 'color', backgroundColor: c } }); },
   setTemplateBackgroundType: (t: BackgroundType) => { actions.pushHistory(); setState({ template: { ...getState().template, backgroundType: t } }); },
   setTemplateBackgroundGradient: (g: BackgroundGradient) => { actions.pushHistory(); setState({ template: { ...getState().template, backgroundType: 'gradient', backgroundGradient: { angle: g.angle ?? 90, colors: g.colors?.length ? g.colors : ['#ffffff', '#e5e7eb'] } } }); },
@@ -84,6 +89,16 @@ export const actions = {
     const { template } = getState();
     setState({ template: { ...template, sections: template.sections.filter(s => s.id !== id) }, selectedSectionId: getState().selectedSectionId === id ? null : getState().selectedSectionId });
   },
+  moveSection: (sectionId: string, newIndex: number) => {
+    actions.pushHistory();
+    const { template } = getState();
+    const sections = [...template.sections];
+    const fromIndex = sections.findIndex(s => s.id === sectionId);
+    if (fromIndex < 0 || fromIndex === newIndex) return;
+    const [removed] = sections.splice(fromIndex, 1);
+    sections.splice(newIndex, 0, removed);
+    setState({ template: { ...template, sections } });
+  },
   addColumnToSection: (sectionId: string) => {
     actions.pushHistory();
     const { template } = getState();
@@ -99,6 +114,7 @@ export const actions = {
     setState({ template: { ...template, sections: template.sections.map(s => s.id === sectionId ? { ...s, layout } : s) } });
   },
   setSectionPadding: (sectionId: string, padding: string) => { actions.pushHistory(); setState({ template: { ...getState().template, sections: getState().template.sections.map(s => s.id === sectionId ? { ...s, padding } : s) } }); },
+  setSectionMargin: (sectionId: string, margin: string) => { actions.pushHistory(); setState({ template: { ...getState().template, sections: getState().template.sections.map(s => s.id === sectionId ? { ...s, margin } : s) } }); },
   setSectionBackground: (sectionId: string, backgroundColor: string) => { actions.pushHistory(); setState({ template: { ...getState().template, sections: getState().template.sections.map(s => s.id === sectionId ? { ...s, backgroundType: 'color', backgroundColor } : s) } }); },
   setSectionBackgroundType: (sectionId: string, t: BackgroundType) => { actions.pushHistory(); setState({ template: { ...getState().template, sections: getState().template.sections.map(s => s.id === sectionId ? { ...s, backgroundType: t } : s) } }); },
   setSectionBackgroundGradient: (sectionId: string, g: BackgroundGradient) => { actions.pushHistory(); setState({ template: { ...getState().template, sections: getState().template.sections.map(s => s.id === sectionId ? { ...s, backgroundType: 'gradient', backgroundGradient: { angle: g.angle ?? 90, colors: g.colors?.length ? g.colors : ['#ffffff', '#e5e7eb'] } } : s) } }); },
