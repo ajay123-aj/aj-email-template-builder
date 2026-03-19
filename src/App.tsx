@@ -45,6 +45,7 @@ export default function App() {
   const [askAIOpen, setAskAIOpen] = useState(false);
   const askAIEnabled = (() => {
     const v = (import.meta.env.VITE_ASK_AI_ENABLED as string | undefined) ?? '';
+    if (v === '' && import.meta.env.PROD) return true; // show in production by default
     return ['true', '1', 'on'].includes(String(v).toLowerCase());
   })();
 
