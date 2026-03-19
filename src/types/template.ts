@@ -40,7 +40,7 @@ export interface DividerConfig {
 export interface SpacerConfig { height: string; }
 export interface SocialConfig { icons: { type: string; url: string }[]; alignment?: string; }
 export interface ColumnsConfig { count: 1 | 2 | 3; widths?: string[]; }
-export interface HeaderConfig extends TextConfig { logoUrl?: string; logoAlt?: string; height?: string; }
+export interface HeaderConfig extends TextConfig { logoUrl?: string; logoAlt?: string; height?: string; glassmorphism?: boolean; }
 export interface FooterConfig { content?: string; backgroundColor?: string; padding?: string; fontSize?: string; color?: string; }
 export interface HtmlConfig { html: string; }
 export interface TableConfig {

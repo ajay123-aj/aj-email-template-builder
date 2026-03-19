@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { Link } from 'react-router-dom';
 import { useEditorStore, actions } from '../store/useEditorStore';
 import { exportToEmailHtml } from '../utils/exportHtml';
 import { extractEmailContent } from '../utils/importHtml';
@@ -99,10 +100,26 @@ export function Toolbar({ isMobile, leftDrawerOpen, rightDrawerOpen, onToggleLef
   return (
     <>
     <header className="min-h-14 flex-shrink-0 flex flex-wrap items-center gap-3 px-4 sm:px-6 py-2.5 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xl shadow-slate-900/5">
-      {/* Brand */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-3">
-        <span className="text-base font-bold tracking-tight text-slate-800">AJ Email Template Editor</span>
-        <span className="text-xs text-slate-500 hidden sm:inline sm:pl-2 sm:border-l sm:border-slate-200">Build → Preview → Export</span>
+      {/* Back button */}
+      <Link
+        to="/"
+        className="flex items-center justify-center w-10 h-10 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-800 transition-colors border border-slate-200/80"
+        title="Back to Templates"
+        aria-label="Back to Templates"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+      </Link>
+      <div className="w-px h-6 bg-slate-200/80" />
+      {/* Brand - matches main page Header */}
+      <div className="flex items-center gap-2">
+        <span className="text-base sm:text-xl font-bold bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
+          AJ Email Editor
+        </span>
+        <span className="text-slate-500 text-xs sm:text-sm font-medium hidden sm:inline">
+          Template Builder
+        </span>
       </div>
       <div className="w-px h-6 bg-slate-200/80" />
       {/* Blocks / Properties toggles only on mobile */}

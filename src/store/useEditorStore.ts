@@ -11,7 +11,7 @@ const createSection = (n: number, layout: SectionLayout = 'row'): EmailSection =
   });
   return { id: uuid(), layout, columns: cols };
 };
-const emptyTemplate = (): EmailTemplate => ({ id: uuid(), name: 'Untitled', width: '600px', padding: '24px', backgroundType: 'color', backgroundColor: '#ffffff', sections: [createSection(1)] });
+const emptyTemplate = (): EmailTemplate => ({ id: uuid(), name: 'Untitled', width: '600px', padding: '24px 24px 0 24px', backgroundType: 'color', backgroundColor: '#ffffff', sections: [createSection(1)] });
 
 interface State {
   template: EmailTemplate;
@@ -65,7 +65,7 @@ export const actions = {
     const col = createColumn();
     col.blocks = [{ id: uuid(), type: 'html', config: { html: html.trim() || '<p></p>' } } as AnyBlock];
     const section: EmailSection = { id: uuid(), layout: 'row', columns: [col] };
-    const template: EmailTemplate = { id: uuid(), name: 'Imported HTML', width: '600px', padding: '24px', backgroundType: 'color', backgroundColor: '#ffffff', sections: [section] };
+    const template: EmailTemplate = { id: uuid(), name: 'Imported HTML', width: '600px', padding: '24px 24px 0 24px', backgroundType: 'color', backgroundColor: '#ffffff', sections: [section] };
     actions.setTemplate(template);
   },
   selectBlock: (id: string | null) => setState({ selectedBlockId: id }),

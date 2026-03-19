@@ -50,7 +50,9 @@ function blockHtml(b: AnyBlock): string {
       const minH = zeroPad ? '0' : (c.height ?? '60px');
       const lineHVal = (c.lineHeight as string)?.trim() || (zeroPad ? '1' : '');
       const lineH = lineHVal ? `;line-height:${lineHVal}` : '';
-      const style = `padding:${headerPad};background:${headerBg};min-height:${minH};font-size:${c.fontSize ?? '28px'};color:${c.color ?? '#111827'};text-align:${align};font-weight:${c.fontWeight ?? 'bold'};width:100%;box-sizing:border-box${lineH}`;
+      const isGlass = (c.glassmorphism as boolean) === true;
+      const glassStyle = isGlass ? `background:rgba(255,255,255,0.15);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.2);border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.08);` : '';
+      const style = `padding:${headerPad};background:${isGlass ? 'transparent' : headerBg};min-height:${minH};font-size:${c.fontSize ?? '28px'};color:${c.color ?? '#111827'};text-align:${align};font-weight:${c.fontWeight ?? 'bold'};width:100%;box-sizing:border-box${lineH}${isGlass ? ';' + glassStyle : ''}`;
       const logo = hasLogo ? `<img src="${esc(String(c.logoUrl))}" alt="${esc(String(c.logoAlt || ''))}" style="max-height:48px;width:auto;vertical-align:middle;" />` : '';
       const text = contentToHtml(c.content as string) || 'Header';
       const alignAttr = align === 'center' ? ' align="center"' : align === 'right' ? ' align="right"' : '';
@@ -125,8 +127,8 @@ export function exportToEmailHtml(template: EmailTemplate): string {
     return `<tr><td style="padding:0;vertical-align:top"><div class="email-section-inner${noPadClass}" style="${innerStyle}"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>${cols}</tr></table></div></td></tr>`;
   }).join('');
 
-  const mainPad = paddingBlockToCss(template.padding, '24px');
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Email</title><style>${RESPONSIVE_STYLE}</style></head><body style="margin:0;padding:0;background:${bg};-webkit-text-size-adjust:100%;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${bg};min-width:100%;"><tr><td align="center" style="padding:0"><table class="email-wrapper" role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:${wCss};max-width:100%;margin:0 auto;background:#fff;"><tr><td class="email-main" style="padding:${mainPad}"><table class="email-sections-table" width="100%" cellpadding="0" cellspacing="0" border="0">${rows}</table></td></tr></table></td></tr></table></body></html>`;
+  const mainPad = paddingBlockToCss(template.padding, '24px 24px 0 24px');
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Email</title><style>${RESPONSIVE_STYLE}</style></head><body style="margin:0;padding:0;background:${bg};-webkit-text-size-adjust:100%;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${bg};min-width:100%;"><tr><td align="center" style="padding:0"><table class="email-wrapper" role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:${wCss};max-width:100%;margin:0 auto;background:#fff;border-collapse:collapse;"><tr><td class="email-main" style="padding:${mainPad}"><table class="email-sections-table" width="100%" cellpadding="0" cellspacing="0" border="0">${rows}</table></td></tr></table></td></tr></table></body></html>`;
 }
 
 function normalizeCssPadding(value: string): string {
