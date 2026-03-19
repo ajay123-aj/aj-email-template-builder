@@ -5,9 +5,10 @@ node_modules/
 dist/
 build/
 
-# Local env
+# Local env (never commit secrets)
 .env
 .env.local
+.env.production
 .env.*.local
 
 # Logs
