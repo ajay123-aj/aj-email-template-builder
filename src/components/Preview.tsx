@@ -1,44 +1,69 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useEditorStore } from '../store/useEditorStore';
 import { exportToEmailHtml } from '../utils/exportHtml';
 
-const HEIGHT_SCRIPT = `<script>(function(){function s(){var h=Math.max(document.documentElement.scrollHeight,document.body.scrollHeight);try{window.parent.postMessage({type:'preview-height',height:h},'*')}catch(e){}}
-if(document.readyState==='complete')s();else window.addEventListener('load',s);
-new MutationObserver(s).observe(document.body,{childList:true,subtree:true})})();<\/script>`;
-
-const NO_SCROLL_STYLE = '<style>html,body{overflow:hidden!important;}</style>';
+function measureIframeHeight(iframe: HTMLIFrameElement): number {
+  try {
+    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (!doc?.body) return 0;
+    const wrapper = doc.querySelector('.email-wrapper') as HTMLElement;
+    if (wrapper) {
+      return Math.ceil(wrapper.offsetTop + wrapper.offsetHeight);
+    }
+    const b = doc.body;
+    const de = doc.documentElement;
+    return Math.max(de.scrollHeight, de.offsetHeight, b.scrollHeight, b.offsetHeight);
+  } catch {
+    return 0;
+  }
+}
 
 export function Preview() {
   const template = useEditorStore(s => s.template);
   const html = exportToEmailHtml(template);
-  const [iframeHeight, setIframeHeight] = useState(600);
+  const sectionCount = template.sections.filter(s => s.columns.length > 0).length;
+  const initialHeight = Math.max(400, sectionCount * 150);
+  const [iframeHeight, setIframeHeight] = useState(initialHeight);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const width = 600;
 
-  const htmlWithScript = html
-    .replace('</head>', NO_SCROLL_STYLE + '</head>')
-    .replace('</body>', HEIGHT_SCRIPT + '</body>');
-
-  const handleMessage = useCallback((e: MessageEvent) => {
-    if (e.data?.type === 'preview-height' && typeof e.data.height === 'number') {
-      setIframeHeight(Math.max(400, e.data.height));
+  const updateHeight = useCallback(() => {
+    const iframe = iframeRef.current;
+    if (!iframe) return;
+    const h = measureIframeHeight(iframe);
+    if (h > 0) {
+      setIframeHeight(Math.ceil(h) + 1);
     }
   }, []);
 
+  const onIframeLoad = useCallback(() => {
+    updateHeight();
+    requestAnimationFrame(updateHeight);
+    setTimeout(updateHeight, 50);
+    setTimeout(updateHeight, 200);
+    setTimeout(updateHeight, 600);
+    setTimeout(updateHeight, 1200);
+  }, [updateHeight]);
+
   useEffect(() => {
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, [handleMessage]);
+    const t1 = setTimeout(updateHeight, 100);
+    const t2 = setTimeout(updateHeight, 500);
+    const t3 = setTimeout(updateHeight, 1500);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, [html, updateHeight]);
 
   return (
-    <div className="flex-1 min-h-0 overflow-auto bg-slate-300 p-4 sm:p-6 !pb-[100px]" style={{ minHeight: '100%' }}>
-      <div className="flex justify-center items-start min-h-full">
-        <div className="bg-white shadow-lg rounded-sm flex-shrink-0" style={{ width, maxWidth: '100%' }}>
+    <div className="flex-1 min-h-0 overflow-auto bg-slate-300 px-0 py-3 sm:p-6 pb-20 lg:pb-32" style={{ minHeight: '100%' }}>
+      <div className="flex flex-col items-center w-full">
+        <div className="bg-white shadow-lg rounded-sm w-fit" style={{ width, maxWidth: '100%' }}>
           <iframe
+            ref={iframeRef}
             title="Preview"
-            srcDoc={htmlWithScript}
+            srcDoc={html}
             className="w-full border-0 block"
-            style={{ height: iframeHeight, minHeight: 400 }}
+            style={{ height: iframeHeight, display: 'block' }}
             sandbox="allow-same-origin"
+            onLoad={onIframeLoad}
           />
         </div>
       </div>

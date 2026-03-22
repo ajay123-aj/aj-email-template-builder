@@ -41,7 +41,7 @@ export function EditorPage() {
   }, [templateId]);
 
   return (
-    <div className="relative h-screen">
+    <div className="relative h-screen w-full overflow-x-hidden">
       <App />
     </div>
   );

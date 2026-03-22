@@ -85,6 +85,18 @@ function blockHtml(b: AnyBlock): string {
       const lis = items.map(item => `<li style="margin-bottom:4px">${contentToHtml(item)}</li>`).join('');
       return `<${listType} style="margin:0 0 8px;padding-left:24px;font-size:${fontSize};color:${color}">${lis}</${listType}>`;
     }
+    case 'social': {
+      const icons = (c.icons as { type?: string; url?: string }[]) ?? [];
+      const align = c.alignment ?? 'center';
+      const links = icons.map(icon => `<a href="${esc(String(icon.url || '#'))}" style="display:inline-block;margin:0 8px;color:#6b7280;text-decoration:none">${icon.type || '•'}</a>`).join('');
+      return links ? `<div style="text-align:${align};padding:12px 0">${links}</div>` : '<div style="padding:12px;text-align:center;color:#9ca3af;font-size:12px">Social icons</div>';
+    }
+    case 'columns': {
+      const count = (c.count as number) ?? 2;
+      const widths = (c.widths as string[]) ?? Array(count).fill(`${100 / count}%`);
+      const cells = widths.slice(0, count).map(w => `<td width="${w}" valign="top" style="padding:8px;vertical-align:top"></td>`).join('');
+      return `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse"><tr>${cells}</tr></table>`;
+    }
     default:
       return '';
   }
@@ -93,11 +105,12 @@ function blockHtml(b: AnyBlock): string {
 function colHtml(blocks: AnyBlock[]) { return blocks.map(blockHtml).join(''); }
 
 const RESPONSIVE_STYLE = `
+  html, body { height: auto !important; min-height: 0 !important; }
   body, table, td, p, a, h1, h2, h3, h4 { font-family: Arial, Helvetica, sans-serif; -webkit-text-size-adjust: 100%; }
   .email-wrapper { width: 100%; max-width: 100%; }
   .email-sections-table { border-collapse: collapse; border-spacing: 0; }
   img { border: 0; outline: none; text-decoration: none; max-width: 100%; height: auto !important; }
-  @media only screen and (max-width: 620px) {
+  @media only screen and (max-width: 500px) {
     .email-wrapper { width: 100% !important; min-width: 0 !important; }
     .email-section-inner:not(.no-padding) { padding: 12px !important; }
     td.email-section-row { display: block !important; width: 100% !important; box-sizing: border-box !important; }
@@ -128,7 +141,7 @@ export function exportToEmailHtml(template: EmailTemplate): string {
   }).join('');
 
   const mainPad = paddingBlockToCss(template.padding, '24px 24px 0 24px');
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Email</title><style>${RESPONSIVE_STYLE}</style></head><body style="margin:0;padding:0;background:${bg};-webkit-text-size-adjust:100%;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${bg};min-width:100%;"><tr><td align="center" style="padding:0"><table class="email-wrapper" role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:${wCss};max-width:100%;margin:0 auto;background:#fff;border-collapse:collapse;"><tr><td class="email-main" style="padding:${mainPad}"><table class="email-sections-table" width="100%" cellpadding="0" cellspacing="0" border="0">${rows}</table></td></tr></table></td></tr></table></body></html>`;
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Email</title><style>${RESPONSIVE_STYLE}</style></head><body style="margin:0;padding:0;background:${bg};-webkit-text-size-adjust:100%;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${bg};min-width:100%;"><tr><td align="center" valign="top" style="padding:0"><table class="email-wrapper" role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:${wCss};max-width:100%;margin:0 auto;background:#fff;border-collapse:collapse;"><tr><td class="email-main" style="padding:${mainPad}"><table class="email-sections-table" width="100%" cellpadding="0" cellspacing="0" border="0">${rows}</table></td></tr></table></td></tr></table></body></html>`;
 }
 
 function normalizeCssPadding(value: string): string {

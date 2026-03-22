@@ -6,6 +6,7 @@ interface ImportMetaEnv {
   readonly VITE_OPENAI_MODEL: string;
   readonly VITE_ASK_AI_ENABLED: string;
   readonly VITE_APP_VERSION: string;
+  readonly VITE_SEND_EMAIL_API_URL?: string;
 }
 
 interface ImportMeta {

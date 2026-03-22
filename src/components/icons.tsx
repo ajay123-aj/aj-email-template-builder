@@ -108,7 +108,15 @@ export function IconSparkles() {
   );
 }
 
-// Block palette icons (slightly smaller for palette items)
+export function IconMail() {
+  return (
+    <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
+  );
+}
+
+// Block palette icons (slightly smaller for palette items) (slightly smaller for palette items)
 const blockIconClass = 'w-6 h-6 flex-shrink-0';
 
 export function IconText() {
@@ -171,6 +179,23 @@ export function IconColumns() {
   return (
     <svg className={blockIconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v14a1 1 0 01-1 1h-4a1 1 0 01-1-1V5z" />
+    </svg>
+  );
+}
+
+export function IconAddRow() {
+  return (
+    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+    </svg>
+  );
+}
+
+export function IconLayoutRow() {
+  return (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <rect x="3" y="6" width="8" height="12" rx="1" strokeWidth={2} />
+      <rect x="13" y="6" width="8" height="12" rx="1" strokeWidth={2} />
     </svg>
   );
 }

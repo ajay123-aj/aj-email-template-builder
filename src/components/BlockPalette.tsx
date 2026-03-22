@@ -7,7 +7,7 @@ function PaletteItem({ type }: { type: BlockType }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: `palette-${type}`, data: { type: 'palette', blockType: type } });
   return (
     <button ref={setNodeRef} type="button" {...listeners} {...attributes}
-      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left text-sm transition-all duration-200 ${isDragging ? 'opacity-50 bg-blue-50 border-blue-200' : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-sm'}`}>
+      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left text-sm transition-all duration-200 select-none touch-manipulation ${isDragging ? 'opacity-50 bg-blue-50 border-blue-200' : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-sm'}`}>
       <span className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 text-slate-600"><BlockIcon type={type} /></span>
       <span className="font-semibold text-slate-700">{BLOCK_LABELS[type]}</span>
     </button>

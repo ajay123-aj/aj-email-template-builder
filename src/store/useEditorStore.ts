@@ -84,6 +84,13 @@ export const actions = {
     const { template } = getState();
     setState({ template: { ...template, sections: [...template.sections, createSection(n, layout)] } });
   },
+  insertSectionAtIndex: (index: number, n: number, layout: SectionLayout = 'row') => {
+    actions.pushHistory();
+    const { template } = getState();
+    const sections = [...template.sections];
+    sections.splice(Math.max(0, index), 0, createSection(n, layout));
+    setState({ template: { ...template, sections } });
+  },
   removeSection: (id: string) => {
     actions.pushHistory();
     const { template } = getState();
