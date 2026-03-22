@@ -18,7 +18,7 @@ export function Header() {
             Template Builder
           </span>
         </Link>
-        <nav className="flex items-center gap-1 sm:gap-4">
+        <nav className="flex items-center gap-1 sm:gap-4" aria-label="Main navigation">
           {isHome && (
             <>
               <a

@@ -240,7 +240,7 @@ export default function App() {
 
   return (
     <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd} onDragCancel={onDragCancel}>
-      <div className="h-screen w-full flex flex-col bg-slate-100 min-h-0 overflow-hidden overflow-x-hidden">
+      <div className="h-screen w-full flex flex-col bg-slate-100 dark:bg-slate-900 min-h-0 overflow-hidden overflow-x-hidden">
         <Toolbar
           isMobile={!isDesktop}
           leftDrawerOpen={leftDrawerOpen}
@@ -252,7 +252,7 @@ export default function App() {
           /* Desktop: Blocks and Properties always visible by default in 3-panel layout */
           <PanelGroup direction="horizontal" className="flex-1 min-h-0">
             <Panel defaultSize={18} minSize={12} maxSize={28} order={1}>
-              <div className="h-full bg-white/95 backdrop-blur-sm border-r border-slate-200/80 overflow-hidden">
+              <div className="h-full bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-r border-slate-200/80 dark:border-slate-700/80 overflow-hidden">
                 <BlockPalette />
               </div>
             </Panel>
@@ -264,7 +264,7 @@ export default function App() {
             </Panel>
             <ResizeHandle />
             <Panel defaultSize={18} minSize={12} maxSize={28} order={3} className="min-h-0">
-              <div className="h-full flex flex-col min-h-0 bg-white/95 backdrop-blur-sm border-l border-slate-200/80">
+              <div className="h-full flex flex-col min-h-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-l border-slate-200/80 dark:border-slate-700/80">
                 <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
                   <PropertiesPanel />
                 </div>
@@ -286,10 +286,10 @@ export default function App() {
                   aria-hidden
                 />
                 <aside
-                  className={`fixed top-12 sm:top-14 left-0 bottom-0 w-[min(280px,85vw)] bg-white/98 backdrop-blur-md border-r border-slate-200/80 shadow-xl shadow-slate-900/10 z-50 flex flex-col lg:hidden transition-transform duration-200 ${paletteDragging ? '-translate-x-full' : 'translate-x-0'}`}
+                  className={`fixed top-12 sm:top-14 left-0 bottom-0 w-[min(280px,85vw)] bg-white/98 dark:bg-slate-800/98 backdrop-blur-md border-r border-slate-200/80 dark:border-slate-700/80 shadow-xl shadow-slate-900/10 dark:shadow-black/20 z-50 flex flex-col lg:hidden transition-transform duration-200 ${paletteDragging ? '-translate-x-full' : 'translate-x-0'}`}
                 >
-                  <div className="flex-shrink-0 flex justify-end px-3 py-2 border-b border-slate-200 bg-white">
-                    <button type="button" onClick={() => setLeftDrawerOpen(false)} className="p-2 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors" aria-label="Close"><IconClose /></button>
+                  <div className="flex-shrink-0 flex justify-end px-3 py-2 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                    <button type="button" onClick={() => setLeftDrawerOpen(false)} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors" aria-label="Close"><IconClose /></button>
                   </div>
                   <div className="flex-1 min-h-0">
                     <BlockPalette />
@@ -301,9 +301,9 @@ export default function App() {
             {rightDrawerOpen && (
               <>
                 <div className="fixed inset-0 bg-black/40 z-40 lg:hidden" onClick={() => setRightDrawerOpen(false)} aria-hidden />
-                <aside className="fixed top-12 sm:top-14 right-0 bottom-0 w-[min(320px,85vw)] bg-white/98 backdrop-blur-md border-l border-slate-200/80 shadow-xl shadow-slate-900/10 z-50 flex flex-col lg:hidden">
-                  <div className="flex-shrink-0 flex justify-end px-3 py-2 border-b border-slate-200 bg-white">
-                    <button type="button" onClick={() => setRightDrawerOpen(false)} className="p-2 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors" aria-label="Close"><IconClose /></button>
+                <aside className="fixed top-12 sm:top-14 right-0 bottom-0 w-[min(320px,85vw)] bg-white/98 dark:bg-slate-800/98 backdrop-blur-md border-l border-slate-200/80 dark:border-slate-700/80 shadow-xl shadow-slate-900/10 dark:shadow-black/20 z-50 flex flex-col lg:hidden">
+                  <div className="flex-shrink-0 flex justify-end px-3 py-2 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                    <button type="button" onClick={() => setRightDrawerOpen(false)} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors" aria-label="Close"><IconClose /></button>
                   </div>
                   <div className="flex-1 min-h-0 overflow-auto">
                     <PropertiesPanel />
@@ -327,17 +327,17 @@ export default function App() {
       </div>
       <DragOverlay dropAnimation={null}>
         {overlayBlock ? (
-          <div className="w-80 max-w-[85vw] rounded-lg border-2 border-blue-400 bg-white shadow-xl p-2 opacity-95 cursor-grabbing touch-manipulation">
+          <div className="w-80 max-w-[85vw] rounded-lg border-2 border-blue-500 bg-white dark:bg-slate-800 shadow-xl p-2 opacity-95 cursor-grabbing touch-manipulation">
             <BlockWrapper block={overlayBlock} sectionId={overlaySectionId} columnId={overlayColumnId} index={0} isOverlay />
           </div>
         ) : overlayPaletteType ? (
-          <div className="w-80 max-w-[85vw] rounded-lg border-2 border-blue-400 bg-white shadow-xl p-3 opacity-95 cursor-grabbing flex items-center gap-2 touch-manipulation">
-            <span className="w-10 h-10 flex items-center justify-center rounded bg-slate-100 text-slate-600"><BlockIcon type={overlayPaletteType} /></span>
-            <span className="font-medium text-slate-700">{BLOCK_LABELS[overlayPaletteType] ?? overlayPaletteType}</span>
+          <div className="w-80 max-w-[85vw] rounded-lg border-2 border-blue-500 bg-white dark:bg-slate-800 shadow-xl p-3 opacity-95 cursor-grabbing flex items-center gap-2 touch-manipulation">
+            <span className="w-10 h-10 flex items-center justify-center rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300"><BlockIcon type={overlayPaletteType} /></span>
+            <span className="font-medium text-slate-700 dark:text-slate-200">{BLOCK_LABELS[overlayPaletteType] ?? overlayPaletteType}</span>
           </div>
         ) : overlaySection ? (
-          <div className="w-fit rounded-lg border-2 border-blue-400 bg-white shadow-xl p-3 opacity-95 cursor-grabbing touch-manipulation">
-            <span className="text-sm font-medium text-slate-700">Section (row)</span>
+          <div className="w-fit rounded-lg border-2 border-blue-500 bg-white dark:bg-slate-800 shadow-xl p-3 opacity-95 cursor-grabbing touch-manipulation">
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Section (row)</span>
           </div>
         ) : null}
       </DragOverlay>

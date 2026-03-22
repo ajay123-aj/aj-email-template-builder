@@ -54,7 +54,7 @@ function ColumnZone({ sectionId, columnId, column, section, children }: { sectio
       ? { flex: '1 1 0', minWidth: 0 }
       : { flexBasis: column.width, width: column.width };
   return (
-    <div ref={setNodeRef} style={style} className={`min-h-[48px] flex flex-col min-w-0 ${isOver ? 'ring-2 ring-inset ring-blue-400 bg-blue-50/30' : ''}`}>
+    <div ref={setNodeRef} style={style} className={`min-h-[48px] flex flex-col min-w-0 ${isOver ? 'ring-2 ring-inset ring-blue-400 dark:ring-blue-500 bg-blue-50/30 dark:bg-blue-900/30' : ''}`}>
       {showLineTop && <InsertionLine />}
       {children}
       {showLineBottom && <InsertionLine />}
@@ -95,7 +95,7 @@ function SortableSection({ section, index }: { section: EmailSection; index: num
           actions.selectBlock(null);
         }
       }}
-      className={`relative transition-all duration-200 group overflow-hidden ${selected ? 'ring-2 ring-blue-500 ring-offset-2 shadow-md' : 'ring-1 ring-slate-200/80 hover:ring-slate-300 hover:shadow-sm'} ${isDragging ? 'opacity-90 shadow-xl z-50 scale-[1.02]' : ''}`}
+      className={`relative transition-all duration-200 group overflow-hidden ${selected ? 'ring-2 ring-blue-500 ring-offset-2 shadow-md' : 'ring-1 ring-slate-200/80 dark:ring-slate-500/80 hover:ring-slate-300 dark:hover:ring-slate-400 hover:shadow-sm'} ${isDragging ? 'opacity-90 shadow-xl z-50 scale-[1.02]' : ''}`}
       style={innerStyle}
     >
       {/* Section header toolbar - visible on hover or when selected */}
@@ -107,10 +107,10 @@ function SortableSection({ section, index }: { section: EmailSection; index: num
         style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.06) 0%, transparent 100%)' }}
       >
         <div className="flex items-center gap-1.5">
-          <span className="text-xs font-medium text-slate-600/90 px-2 py-0.5 rounded-md bg-white/80 shadow-sm">Section {index + 1}</span>
+          <span className="text-xs font-medium text-slate-600 dark:text-slate-200 px-2 py-0.5 rounded-md bg-white/80 dark:bg-slate-800/90 shadow-sm">Section {index + 1}</span>
           <button
             type="button"
-            className={`p-1.5 rounded-lg transition-colors ${layout === 'row' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+            className={`p-1.5 rounded-lg transition-colors ${layout === 'row' ? 'bg-blue-100 dark:bg-blue-600/90 text-blue-700 dark:text-white' : 'bg-slate-100 dark:bg-slate-700/90 text-slate-500 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'}`}
             onClick={e => { e.stopPropagation(); actions.setSectionLayout(section.id, 'row'); }}
             title="Row layout (side by side)"
           >
@@ -118,7 +118,7 @@ function SortableSection({ section, index }: { section: EmailSection; index: num
           </button>
           <button
             type="button"
-            className={`p-1.5 rounded-lg transition-colors ${layout === 'column' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+            className={`p-1.5 rounded-lg transition-colors ${layout === 'column' ? 'bg-blue-100 dark:bg-blue-600/90 text-blue-700 dark:text-white' : 'bg-slate-100 dark:bg-slate-700/90 text-slate-500 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'}`}
             onClick={e => { e.stopPropagation(); actions.setSectionLayout(section.id, 'column'); }}
             title="Column layout"
           >
@@ -126,11 +126,11 @@ function SortableSection({ section, index }: { section: EmailSection; index: num
           </button>
         </div>
         <div className="flex items-center gap-1">
-          <button type="button" className="p-1.5 rounded-lg bg-white/90 shadow-sm text-slate-600 hover:bg-slate-100 cursor-grab active:cursor-grabbing touch-manipulation" {...listeners} {...attributes} title="Drag to reorder">
+          <button type="button" className="p-1.5 rounded-lg bg-white/90 dark:bg-slate-700/90 shadow-sm text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-600 cursor-grab active:cursor-grabbing touch-manipulation" {...listeners} {...attributes} title="Drag to reorder">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 6h2v2H8V6zm0 5h2v2H8v-2zm0 5h2v2H8v-2zm5-10h2v2h-2V6zm0 5h2v2h-2v-2zm0 5h2v2h-2v-2z" /></svg>
           </button>
           <ConfirmTooltip message="Remove this section?" onConfirm={() => actions.removeSection(section.id)} placement="bottom">
-            <button type="button" className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 shadow-sm" title="Remove section">
+            <button type="button" className="p-1.5 rounded-lg bg-red-50 dark:bg-red-900/80 text-red-600 dark:text-red-200 hover:bg-red-100 dark:hover:bg-red-800 shadow-sm" title="Remove section">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
             </button>
           </ConfirmTooltip>
@@ -144,8 +144,8 @@ function SortableSection({ section, index }: { section: EmailSection; index: num
                 <BlockItem key={block.id} block={block} sectionId={section.id} columnId={col.id} index={idx} sectionSelected={selected && !sectionHasSelectedBlock} />
               ))}
               {col.blocks.length === 0 && (
-                <div className="min-h-[72px] flex flex-col items-center justify-center py-6 px-4 border-2 border-dashed border-slate-200 bg-slate-50/50 text-slate-500 text-sm transition-colors hover:border-blue-300 hover:bg-blue-50/30">
-                  <svg className="w-8 h-8 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                <div className="min-h-[72px] flex flex-col items-center justify-center py-6 px-4 border-2 border-dashed border-slate-200 dark:border-slate-500 bg-slate-50/50 dark:bg-slate-800/30 text-slate-500 dark:text-slate-400 text-sm transition-colors hover:border-blue-300 dark:hover:border-blue-500 hover:bg-blue-50/30 dark:hover:bg-blue-900/20">
+                  <svg className="w-8 h-8 mb-2 text-slate-300 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                   <span className="font-medium">Drop blocks here</span>
                   <span className="text-xs mt-0.5">or drag from the left</span>
                 </div>
@@ -171,16 +171,16 @@ const SECTION_OPTIONS: { n: number; label: string; icon: 'row' | 'columns' }[] =
 
 function AddSectionDropdown({ onAdd, onClose }: { onAdd: (n: number) => void; onClose: () => void }) {
   return (
-    <div className="absolute left-0 bottom-full mb-1 py-1.5 min-w-[160px] bg-white rounded-xl border border-slate-200 shadow-xl z-50">
+    <div className="absolute left-0 bottom-full mb-1 py-1.5 min-w-[160px] bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-600 shadow-xl z-50">
       {SECTION_OPTIONS.map(({ n, label, icon }) => (
         <button
           key={n}
           type="button"
-          className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
           onClick={() => { onAdd(n); onClose(); }}
           title={n === 1 ? 'Add single row' : `Add row with ${n} columns`}
         >
-          <span className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+          <span className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
             {icon === 'row' ? <IconAddRow /> : <IconColumns />}
           </span>
           <span>{label}</span>
@@ -192,16 +192,16 @@ function AddSectionDropdown({ onAdd, onClose }: { onAdd: (n: number) => void; on
 
 function AddSectionDropdownBelow({ onAdd, onClose }: { onAdd: (n: number) => void; onClose: () => void }) {
   return (
-    <div className="absolute left-0 top-full mt-1 py-1.5 min-w-[160px] bg-white rounded-xl border border-slate-200 shadow-xl z-50">
+    <div className="absolute left-0 top-full mt-1 py-1.5 min-w-[160px] bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-600 shadow-xl z-50">
       {SECTION_OPTIONS.map(({ n, label, icon }) => (
         <button
           key={n}
           type="button"
-          className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
           onClick={() => { onAdd(n); onClose(); }}
           title={n === 1 ? 'Add single row' : `Add row with ${n} columns`}
         >
-          <span className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+          <span className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
             {icon === 'row' ? <IconAddRow /> : <IconColumns />}
           </span>
           <span>{label}</span>
@@ -229,7 +229,7 @@ function EmptyCanvasDropZone({
     <div
       ref={setNodeRef}
       className={`text-center py-12 px-6 min-h-[160px] border-2 border-dashed transition-all duration-200 ${
-        isOver ? 'border-blue-400 bg-blue-50/60 ring-2 ring-blue-200' : 'border-slate-200 bg-slate-50/30 hover:border-slate-300'
+        isOver ? 'border-blue-400 dark:border-blue-500 bg-blue-50/60 dark:bg-blue-900/30 ring-2 ring-blue-200 dark:ring-blue-400' : 'border-slate-200 dark:border-slate-300 bg-slate-50/30 dark:bg-slate-50/50 hover:border-slate-300 dark:hover:border-slate-400'
       }`}
     >
       <p className="text-slate-700 font-semibold mb-1">Your email template</p>
@@ -238,7 +238,7 @@ function EmptyCanvasDropZone({
         <button
           ref={buttonRef as React.Ref<HTMLButtonElement>}
           type="button"
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-slate-200/80 bg-white hover:bg-slate-50 shadow-sm transition-all duration-200"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-slate-200/80 dark:border-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-white shadow-sm transition-all duration-200"
           onClick={(e) => { e.stopPropagation(); setAddMenuOpen(o => !o); }}
           title="Add row or columns"
         >
@@ -279,7 +279,7 @@ export function Canvas() {
     return () => document.removeEventListener('click', close);
   }, [addMenuOpen]);
   return (
-    <div className="flex-1 min-h-0 overflow-auto bg-slate-200 px-0 py-3 sm:p-6 pb-20 lg:pb-32" onClick={() => { actions.selectBlock(null); actions.selectSection(null); }}>
+    <div className="flex-1 min-h-0 overflow-auto bg-slate-200 dark:bg-slate-900 px-0 py-3 sm:p-6 pb-20 lg:pb-32" onClick={() => { actions.selectBlock(null); actions.selectSection(null); }}>
       <div className="flex justify-center items-start min-h-full w-full">
         <div className="min-h-[400px] w-full max-w-full flex-shrink-0 bg-white shadow-xl overflow-hidden" style={{ width: canvasWidth, maxWidth: '100%', background: bg }}>
           <div style={paddingBlockToStyle(template.padding, '24px')}>
@@ -297,7 +297,7 @@ export function Canvas() {
                 <button
                   ref={buttonRef}
                   type="button"
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-100 hover:border-slate-300 text-slate-700 transition-all duration-200"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold border-2 border-dashed border-slate-200 dark:border-slate-300 bg-slate-50/50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-white transition-all duration-200"
                   onClick={(e) => { e.stopPropagation(); setAddMenuOpen(o => !o); }}
                   title="Add row or columns"
                 >

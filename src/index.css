@@ -142,3 +142,18 @@ body { margin: 0; padding: 0; font-family: system-ui, sans-serif; -webkit-tap-hi
   opacity: 1;
   transform: translateY(0);
 }
+
+/* Editor dark theme form elements */
+.editor-dark input:not([type="color"]):not([type="checkbox"]),
+.editor-dark select {
+  @apply bg-slate-700 border-slate-600 text-slate-100 placeholder-slate-500;
+}
+.editor-dark input[type="color"] {
+  @apply border-slate-600 bg-slate-700;
+}
+.editor-dark label {
+  @apply text-slate-400;
+}
+.editor-dark input[type="checkbox"] {
+  @apply accent-blue-500;
+}

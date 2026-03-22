@@ -13,7 +13,7 @@ interface EditorFooterProps {
   onAskAIOpen: () => void;
 }
 
-const barBase = 'rounded-2xl border border-white/80 bg-white/95 backdrop-blur-xl ring-1 ring-slate-200/20 shadow-[0_4px_24px_rgba(15,23,42,0.08),0_0_0_1px_rgba(0,0,0,0.04)]';
+const barBase = 'rounded-2xl border border-white/80 dark:border-slate-600/80 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl ring-1 ring-slate-200/20 dark:ring-slate-700/50 shadow-[0_4px_24px_rgba(15,23,42,0.08),0_0_0_1px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.4),0_0_0_1px_rgba(30,41,59,0.5)]';
 const btnIconSize = 'w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 flex items-center justify-center rounded-lg sm:rounded-xl transition-all duration-200 flex-shrink-0';
 
 export function EditorFooter({
@@ -44,7 +44,7 @@ export function EditorFooter({
                   type="button"
                   onClick={() => actions.undo()}
                   disabled={!canUndo}
-                  className={`${btnIconSize} text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed`}
+                  className={`${btnIconSize} text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed`}
                   aria-label="Undo last change"
                 >
                   <IconUndo />
@@ -55,7 +55,7 @@ export function EditorFooter({
                   type="button"
                   onClick={() => actions.redo()}
                   disabled={!canRedo}
-                  className={`${btnIconSize} text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed`}
+                  className={`${btnIconSize} text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed`}
                   aria-label="Redo last change"
                 >
                   <IconRedo />
@@ -68,7 +68,7 @@ export function EditorFooter({
                 <button
                   type="button"
                   onClick={() => actions.setShowPreview(false)}
-                  className={`${btnIconSize} ${!showPreview ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'}`}
+                  className={`${btnIconSize} ${!showPreview ? 'bg-slate-800 dark:bg-blue-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                   aria-label="Edit mode"
                 >
                   <IconEdit />
@@ -78,7 +78,7 @@ export function EditorFooter({
                 <button
                   type="button"
                   onClick={() => actions.setShowPreview(true)}
-                  className={`${btnIconSize} ${showPreview ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'}`}
+                  className={`${btnIconSize} ${showPreview ? 'bg-slate-800 dark:bg-blue-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                   aria-label="Preview"
                 >
                   <IconPreview />
@@ -86,12 +86,12 @@ export function EditorFooter({
               </Tooltip>
               {askAIEnabled && (
                 <>
-                  <div className="w-px h-5 bg-slate-200/80 flex-shrink-0" />
+                  <div className="w-px h-5 bg-slate-200 dark:bg-slate-600 flex-shrink-0" />
                   <Tooltip text="Ask AI for suggestions" placement="top">
                     <button
                       type="button"
                       onClick={onAskAIOpen}
-                      className={`${btnIconSize} text-violet-600 hover:bg-violet-50`}
+                      className={`${btnIconSize} text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/50`}
                       aria-label="Ask AI"
                     >
                       <IconSparkles />
@@ -112,30 +112,30 @@ export function EditorFooter({
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 w-fit">
         <div className={`flex items-center ${barBase} p-1 gap-0.5`}>
           <Tooltip text="Open blocks panel" placement="top">
-            <button type="button" onClick={onToggleLeftDrawer} className={`${btnIconSize} ${leftDrawerOpen ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`} aria-label="Blocks"><IconBlocks /></button>
+            <button type="button" onClick={onToggleLeftDrawer} className={`${btnIconSize} ${leftDrawerOpen ? 'bg-slate-800 dark:bg-blue-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`} aria-label="Blocks"><IconBlocks /></button>
           </Tooltip>
           <Tooltip text="Open properties panel" placement="top">
-            <button type="button" onClick={onToggleRightDrawer} className={`${btnIconSize} ${rightDrawerOpen ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`} aria-label="Properties"><IconProperties /></button>
+            <button type="button" onClick={onToggleRightDrawer} className={`${btnIconSize} ${rightDrawerOpen ? 'bg-slate-800 dark:bg-blue-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`} aria-label="Properties"><IconProperties /></button>
           </Tooltip>
-          <div className="w-px h-5 bg-slate-200/80 flex-shrink-0" />
+          <div className="w-px h-5 bg-slate-200 dark:bg-slate-600 flex-shrink-0" />
           <Tooltip text="Undo" placement="top">
-            <button type="button" onClick={() => actions.undo()} disabled={!canUndo} className={`${btnIconSize} text-slate-600 hover:bg-slate-100 disabled:opacity-40`} aria-label="Undo"><IconUndo /></button>
+            <button type="button" onClick={() => actions.undo()} disabled={!canUndo} className={`${btnIconSize} text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40`} aria-label="Undo"><IconUndo /></button>
           </Tooltip>
           <Tooltip text="Redo" placement="top">
-            <button type="button" onClick={() => actions.redo()} disabled={!canRedo} className={`${btnIconSize} text-slate-600 hover:bg-slate-100 disabled:opacity-40`} aria-label="Redo"><IconRedo /></button>
+            <button type="button" onClick={() => actions.redo()} disabled={!canRedo} className={`${btnIconSize} text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40`} aria-label="Redo"><IconRedo /></button>
           </Tooltip>
-          <div className="w-px h-5 bg-slate-200/80 flex-shrink-0" />
+          <div className="w-px h-5 bg-slate-200 dark:bg-slate-600 flex-shrink-0" />
           <Tooltip text="Edit mode" placement="top">
-            <button type="button" onClick={() => actions.setShowPreview(false)} className={`${btnIconSize} ${!showPreview ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`} aria-label="Edit"><IconEdit /></button>
+            <button type="button" onClick={() => actions.setShowPreview(false)} className={`${btnIconSize} ${!showPreview ? 'bg-slate-800 dark:bg-blue-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`} aria-label="Edit"><IconEdit /></button>
           </Tooltip>
           <Tooltip text="Preview email" placement="top">
-            <button type="button" onClick={() => actions.setShowPreview(true)} className={`${btnIconSize} ${showPreview ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`} aria-label="Preview"><IconPreview /></button>
+            <button type="button" onClick={() => actions.setShowPreview(true)} className={`${btnIconSize} ${showPreview ? 'bg-slate-800 dark:bg-blue-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`} aria-label="Preview"><IconPreview /></button>
           </Tooltip>
           {askAIEnabled && (
             <>
-              <div className="w-px h-5 bg-slate-200/80 flex-shrink-0" />
+              <div className="w-px h-5 bg-slate-200 dark:bg-slate-600 flex-shrink-0" />
               <Tooltip text="Ask AI for suggestions" placement="top">
-                <button type="button" onClick={onAskAIOpen} className={`${btnIconSize} text-violet-600 hover:bg-violet-100`} aria-label="Ask AI"><IconSparkles /></button>
+                <button type="button" onClick={onAskAIOpen} className={`${btnIconSize} text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/50`} aria-label="Ask AI"><IconSparkles /></button>
               </Tooltip>
             </>
           )}

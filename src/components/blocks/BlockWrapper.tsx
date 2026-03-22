@@ -17,7 +17,7 @@ export function BlockWrapper({ block, sectionId, columnId, index, isOverlay, sec
   const showBlockMenu = !isOverlay && !sectionSelected && selected;
   return (
     <div ref={setNodeRef} style={style} onClick={e => { e.stopPropagation(); actions.selectBlock(block.id); actions.selectSection(sectionId); }}
-      className={`relative rounded transition-all group ${selected ? 'ring-2 ring-inset ring-blue-500' : 'ring-2 ring-inset ring-transparent hover:ring-slate-300'} ${isDragging ? 'opacity-80 shadow-lg z-50' : ''}`}>
+      className={`relative rounded transition-all group ${selected ? 'ring-2 ring-inset ring-blue-500' : 'ring-2 ring-inset ring-transparent hover:ring-slate-400'} ${isDragging ? 'opacity-80 shadow-lg z-50' : ''}`}>
       {showBlockMenu && (
         <div className="absolute top-1 right-1 flex items-center gap-0.5 z-10">
           <button type="button" className="px-1.5 py-0.5 text-xs rounded bg-slate-700/90 text-white shadow hover:bg-slate-600 cursor-grab active:cursor-grabbing touch-manipulation" {...listeners} {...attributes} title="Drag">⋮⋮</button>
