@@ -149,6 +149,43 @@ export const actions = {
       template: { ...template, sections: template.sections.map(s => s.id !== sectionId ? s : { ...s, columns: s.columns.map(c => c.id !== columnId ? c : { ...c, width }) }) },
     });
   },
+  setColumnBackground: (sectionId: string, columnId: string, backgroundColor: string) => {
+    actions.pushHistory();
+    const { template } = getState();
+    setState({ template: { ...template, sections: template.sections.map(s => s.id !== sectionId ? s : { ...s, columns: s.columns.map(c => c.id !== columnId ? c : { ...c, backgroundType: 'color', backgroundColor }) }) } });
+  },
+  setColumnBackgroundType: (sectionId: string, columnId: string, t: BackgroundType) => {
+    actions.pushHistory();
+    const { template } = getState();
+    setState({ template: { ...template, sections: template.sections.map(s => s.id !== sectionId ? s : { ...s, columns: s.columns.map(c => c.id !== columnId ? c : { ...c, backgroundType: t }) }) } });
+  },
+  setColumnBackgroundGradient: (sectionId: string, columnId: string, g: BackgroundGradient) => {
+    actions.pushHistory();
+    const { template } = getState();
+    setState({ template: { ...template, sections: template.sections.map(s => s.id !== sectionId ? s : { ...s, columns: s.columns.map(c => c.id !== columnId ? c : { ...c, backgroundType: 'gradient', backgroundGradient: { angle: g.angle ?? 90, colors: g.colors?.length ? g.colors : ['#ffffff', '#e5e7eb'] } }) }) } });
+  },
+  setColumnBackgroundImage: (sectionId: string, columnId: string, url: string, size?: 'cover' | 'contain' | 'auto', position?: string) => {
+    actions.pushHistory();
+    const { template } = getState();
+    setState({ template: { ...template, sections: template.sections.map(s => s.id !== sectionId ? s : { ...s, columns: s.columns.map(c => c.id !== columnId ? c : { ...c, backgroundType: 'image', backgroundImageUrl: url, backgroundImageSize: size, backgroundImagePosition: position }) }) } });
+  },
+  setColumnPadding: (sectionId: string, columnId: string, padding: string) => {
+    actions.pushHistory();
+    const { template } = getState();
+    setState({ template: { ...template, sections: template.sections.map(s => s.id !== sectionId ? s : { ...s, columns: s.columns.map(c => c.id !== columnId ? c : { ...c, padding }) }) } });
+  },
+  setColumnBorderRadius: (sectionId: string, columnId: string, borderRadius: string) => {
+    actions.pushHistory();
+    const { template } = getState();
+    setState({ template: { ...template, sections: template.sections.map(s => s.id !== sectionId ? s : { ...s, columns: s.columns.map(c => c.id !== columnId ? c : { ...c, borderRadius }) }) } });
+  },
+  setColumnHeight: (sectionId: string, columnId: string, height: string) => {
+    actions.pushHistory();
+    const { template } = getState();
+    setState({ template: { ...template, sections: template.sections.map(s => s.id !== sectionId ? s : { ...s, columns: s.columns.map(c => c.id !== columnId ? c : { ...c, height: height || undefined }) }) } });
+  },
+  setSectionBorderRadius: (sectionId: string, borderRadius: string) => { actions.pushHistory(); setState({ template: { ...getState().template, sections: getState().template.sections.map(s => s.id === sectionId ? { ...s, borderRadius } : s) } }); },
+  setSectionHeight: (sectionId: string, height: string) => { actions.pushHistory(); setState({ template: { ...getState().template, sections: getState().template.sections.map(s => s.id === sectionId ? { ...s, height: height || undefined } : s) } }); },
   addBlock: (sectionId: string, columnId: string, index: number, block: AnyBlock) => {
     actions.pushHistory();
     const { template } = getState();

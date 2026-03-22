@@ -62,7 +62,17 @@ export interface SectionConfig extends BackgroundOptions {
   margin?: string;
 }
 export type AnyBlock = BaseBlock<'text', TextConfig> | BaseBlock<'heading', HeadingConfig> | BaseBlock<'image', ImageConfig> | BaseBlock<'button', ButtonConfig> | BaseBlock<'divider', DividerConfig> | BaseBlock<'spacer', SpacerConfig> | BaseBlock<'social', SocialConfig> | BaseBlock<'columns', ColumnsConfig> | BaseBlock<'header', HeaderConfig> | BaseBlock<'footer', FooterConfig> | BaseBlock<'html', HtmlConfig> | BaseBlock<'table', TableConfig> | BaseBlock<'list', ListConfig> | BaseBlock<'section', SectionConfig>;
-export interface EmailColumn { id: string; width?: string; blocks: AnyBlock[]; }
+export interface EmailColumn extends Partial<BackgroundOptions> {
+  id: string;
+  width?: string;
+  blocks: AnyBlock[];
+  /** Padding for this column (e.g. "16px") */
+  padding?: string;
+  /** Border radius for this column (e.g. "8px") */
+  borderRadius?: string;
+  /** Height: auto, fit-content, or custom (e.g. "200px", "100%") */
+  height?: string;
+}
 export type SectionLayout = 'row' | 'column';
 
 export type BackgroundType = 'color' | 'gradient' | 'image';
@@ -93,5 +103,9 @@ export interface EmailSection extends BackgroundOptions {
   columnSeparator?: ColumnSeparatorType;
   /** Color for the column separator (e.g. "#e5e7eb") */
   columnSeparatorColor?: string;
+  /** Border radius for the section (e.g. "8px", "12px") */
+  borderRadius?: string;
+  /** Height: auto, fit-content, or custom (e.g. "200px", "100%") */
+  height?: string;
 }
 export interface EmailTemplate extends BackgroundOptions { id: string; name?: string; width?: string; padding?: string; sections: EmailSection[]; }

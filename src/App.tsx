@@ -327,13 +327,13 @@ export default function App() {
       </div>
       <DragOverlay dropAnimation={null}>
         {overlayBlock ? (
-          <div className="w-80 max-w-[85vw] rounded-lg border-2 border-blue-500 bg-white dark:bg-slate-800 shadow-xl p-2 opacity-95 cursor-grabbing touch-manipulation">
+          <div className="w-fit max-w-[85vw] rounded-lg border-2 border-blue-500 bg-white dark:bg-slate-800 shadow-xl p-2 opacity-95 cursor-grabbing touch-manipulation">
             <BlockWrapper block={overlayBlock} sectionId={overlaySectionId} columnId={overlayColumnId} index={0} isOverlay />
           </div>
         ) : overlayPaletteType ? (
-          <div className="w-80 max-w-[85vw] rounded-lg border-2 border-blue-500 bg-white dark:bg-slate-800 shadow-xl p-3 opacity-95 cursor-grabbing flex items-center gap-2 touch-manipulation">
-            <span className="w-10 h-10 flex items-center justify-center rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300"><BlockIcon type={overlayPaletteType} /></span>
-            <span className="font-medium text-slate-700 dark:text-slate-200">{BLOCK_LABELS[overlayPaletteType] ?? overlayPaletteType}</span>
+          <div className="w-fit max-w-[85vw] rounded-lg border-2 border-blue-500 bg-white dark:bg-slate-800 shadow-xl p-3 opacity-95 cursor-grabbing flex items-center gap-2 touch-manipulation shrink-0">
+            <span className="w-10 h-10 flex items-center justify-center rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 shrink-0"><BlockIcon type={overlayPaletteType} /></span>
+            <span className="font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">{BLOCK_LABELS[overlayPaletteType] ?? overlayPaletteType}</span>
           </div>
         ) : overlaySection ? (
           <div className="w-fit rounded-lg border-2 border-blue-500 bg-white dark:bg-slate-800 shadow-xl p-3 opacity-95 cursor-grabbing touch-manipulation">

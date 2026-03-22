@@ -76,6 +76,8 @@ function ColumnZone({ sectionId, columnId, column, section, columnIndex, childre
   const separator = section.columnSeparator ?? 'none';
   const sepColor = section.columnSeparatorColor ?? '#e5e7eb';
   const showSeparator = isRow && n > 1 && columnIndex > 0 && separator !== 'none';
+  const hasColumnBg = column.backgroundType || column.backgroundColor;
+  const columnBg = hasColumnBg ? getBackgroundStyle(column) : undefined;
   const style: React.CSSProperties = {
     ...(section.layout === 'column'
       ? { width: '100%' }
@@ -83,6 +85,10 @@ function ColumnZone({ sectionId, columnId, column, section, columnIndex, childre
         ? { flex: '1 1 0', minWidth: 0 }
         : { flexBasis: column.width, width: column.width }),
     ...(showSeparator && { borderLeft: `${separator === 'line' ? '1px' : '2px'} solid ${sepColor}` }),
+    ...(columnBg && { background: columnBg }),
+    ...(column.padding && { padding: column.padding }),
+    ...(column.borderRadius && { borderRadius: column.borderRadius, overflow: 'hidden' }),
+    ...(column.height && { height: column.height }),
   };
   return (
     <div ref={setNodeRef} style={style} className={`min-h-[48px] flex flex-col min-w-0 ${isOver ? 'ring-2 ring-inset ring-blue-400 dark:ring-blue-500 bg-blue-50/30 dark:bg-blue-900/30' : ''}`}>
@@ -111,7 +117,10 @@ function SortableSection({ section, index: _index }: { section: EmailSection; in
     padding: (section.padding || '16px').trim() || '16px',
     margin: (section.margin || '0').trim() || '0',
     background: getBackgroundStyle(section),
+    ...(section.borderRadius && { borderRadius: section.borderRadius, overflow: 'hidden' }),
+    ...(section.height && { height: section.height }),
     ...(transform ? { transform: CSS.Transform.toString(transform), transition } : {}),
+    ...(isDragging && { width: 'fit-content', maxWidth: '100%' }),
   };
   return (
     <>

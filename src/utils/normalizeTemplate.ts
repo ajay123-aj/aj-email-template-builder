@@ -29,7 +29,17 @@ function ensureColumn(col: unknown): EmailColumn | null {
     const b = ensureBlock(rb);
     if (b) blocks.push(b);
   }
-  return { id, width: typeof c.width === 'string' ? c.width : '100%', blocks };
+  const out: EmailColumn = { id, width: typeof c.width === 'string' ? c.width : '100%', blocks };
+  if (c.backgroundType) out.backgroundType = c.backgroundType === 'gradient' ? 'gradient' : c.backgroundType === 'image' ? 'image' : 'color';
+  if (typeof c.backgroundColor === 'string') out.backgroundColor = c.backgroundColor;
+  if (c.backgroundGradient && typeof c.backgroundGradient === 'object') out.backgroundGradient = c.backgroundGradient as EmailColumn['backgroundGradient'];
+  if (typeof c.backgroundImageUrl === 'string') out.backgroundImageUrl = c.backgroundImageUrl;
+  const imgSize = normalizeBackgroundImageSize(c.backgroundImageSize); if (imgSize) out.backgroundImageSize = imgSize;
+  if (typeof c.backgroundImagePosition === 'string') out.backgroundImagePosition = c.backgroundImagePosition;
+  if (typeof c.padding === 'string') out.padding = c.padding;
+  if (typeof c.borderRadius === 'string') out.borderRadius = c.borderRadius;
+  if (typeof c.height === 'string') out.height = c.height;
+  return out;
 }
 
 function ensureSection(sec: unknown): EmailSection | null {
@@ -61,6 +71,8 @@ function ensureSection(sec: unknown): EmailSection | null {
     columnGap: typeof s.columnGap === 'string' ? s.columnGap : undefined,
     columnSeparator: sep,
     columnSeparatorColor: typeof s.columnSeparatorColor === 'string' ? s.columnSeparatorColor : undefined,
+    borderRadius: typeof s.borderRadius === 'string' ? s.borderRadius : undefined,
+    height: typeof s.height === 'string' ? s.height : undefined,
     columns,
   } as EmailSection;
 }

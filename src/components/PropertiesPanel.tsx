@@ -268,16 +268,119 @@ function SectionProps({ sectionId }: { sectionId: string }) {
         <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Margin</label>
         <input type="text" value={section.margin ?? ''} onChange={e => actions.setSectionMargin(sectionId, e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-500" placeholder="0 or 16px 0" />
       </div>
+      <div className="space-y-2">
+        <h4 className="text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wide">Row</h4>
+        <div>
+          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Height</label>
+          <select value={section.height === 'fit-content' ? 'fit-content' : section.height && section.height !== 'auto' ? 'custom' : 'auto'} onChange={e => { const v = e.target.value; actions.setSectionHeight(sectionId, v === 'custom' ? (section.height && section.height !== 'auto' && section.height !== 'fit-content' ? section.height : '200px') : v); }} className="w-full px-2 py-1.5 text-sm rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 mb-1.5">
+            <option value="auto">Auto</option>
+            <option value="fit-content">Fit content</option>
+            <option value="custom">Custom</option>
+          </select>
+          {(section.height && section.height !== 'auto' && section.height !== 'fit-content') && (
+            <input type="text" value={section.height} onChange={e => actions.setSectionHeight(sectionId, e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-500" placeholder="200px, 100%" />
+          )}
+        </div>
+        <div>
+          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Border radius</label>
+          <input type="text" value={section.borderRadius ?? ''} onChange={e => actions.setSectionBorderRadius(sectionId, e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-500" placeholder="0, 8px, 12px" />
+        </div>
+      </div>
       <SectionBackgroundFields sectionId={sectionId} />
       {multiColumn && (
         <>
-          <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Column widths</label>
-            <div className="space-y-2">
+          <div className="space-y-3">
+            <h4 className="text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wide">Column design</h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Each column can have its own background, radius & padding.</p>
+            <div className="flex flex-col gap-3">
               {section.columns.map((col, i) => (
-                <div key={col.id} className="flex items-center gap-2">
-                  <span className="text-xs text-slate-500 dark:text-slate-400 w-8">Col {i + 1}</span>
-                  <input type="text" value={col.width ?? ''} onChange={e => actions.setColumnWidth(sectionId, col.id, e.target.value)} className="flex-1 px-2 py-1.5 text-sm rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-500" placeholder="e.g. 50%" />
+                <div key={col.id} className="flex flex-col gap-2.5 p-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800/80 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Column {i + 1}</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500">{(col.width || `${Math.floor(100 / section.columns.length)}%`).replace(/\.\d+%/, '%')}</span>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-slate-500 dark:text-slate-400 mb-1">Width</label>
+                    <input type="text" value={col.width ?? ''} onChange={e => actions.setColumnWidth(sectionId, col.id, e.target.value)} className="w-full min-w-0 px-2.5 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900 focus:border-blue-400" placeholder="50%, 33%" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[11px] text-slate-500 dark:text-slate-400">Background</label>
+                    <select value={(col.backgroundType ?? 'color') as string} onChange={e => {
+                      const t = e.target.value as BackgroundType;
+                      actions.setColumnBackgroundType(sectionId, col.id, t);
+                      if (t === 'gradient' && !col.backgroundGradient?.colors?.length) actions.setColumnBackgroundGradient(sectionId, col.id, { angle: 90, colors: ['#ffffff', '#e5e7eb'] });
+                    }} className="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900">
+                      <option value="color">Plain color</option>
+                      <option value="gradient">Linear gradient</option>
+                      <option value="image">Image</option>
+                    </select>
+                    {(col.backgroundType ?? 'color') === 'color' && (
+                      <div className="flex gap-2 min-w-0">
+                        <input type="color" value={col.backgroundColor ?? '#ffffff'} onChange={e => actions.setColumnBackground(sectionId, col.id, e.target.value)} className="h-9 w-10 shrink-0 rounded-lg border border-slate-200 dark:border-slate-600 cursor-pointer" title="Pick color" />
+                        <input type="text" value={col.backgroundColor ?? ''} onChange={e => actions.setColumnBackground(sectionId, col.id, e.target.value)} className="flex-1 min-w-0 px-2.5 py-1.5 text-xs font-mono rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900" placeholder="#ffffff" />
+                      </div>
+                    )}
+                    {(col.backgroundType ?? 'color') === 'gradient' && (
+                      <>
+                        <div>
+                          <label className="block text-[10px] text-slate-500 dark:text-slate-400 mb-0.5">Angle (degrees)</label>
+                          <input type="number" min={0} max={360} value={Number(col.backgroundGradient?.angle ?? 90)} onChange={e => actions.setColumnBackgroundGradient(sectionId, col.id, { ...col.backgroundGradient, angle: Number(e.target.value) })} className="w-full px-2 py-1 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100" />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-slate-500 dark:text-slate-400 mb-0.5">Colors</label>
+                          {(col.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb']).map((color, i) => (
+                            <div key={i} className="flex gap-2 mb-1.5">
+                              <input type="color" value={color.startsWith('#') && color.length >= 4 ? color : '#ffffff'} onChange={e => { const c = [...(col.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb'])]; c[i] = e.target.value; actions.setColumnBackgroundGradient(sectionId, col.id, { ...col.backgroundGradient, colors: c }); }} className="h-8 w-9 shrink-0 rounded border border-slate-200 dark:border-slate-600 cursor-pointer" />
+                              <input type="text" value={color} onChange={e => { const c = [...(col.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb'])]; c[i] = e.target.value; actions.setColumnBackgroundGradient(sectionId, col.id, { ...col.backgroundGradient, colors: c }); }} className="flex-1 min-w-0 px-2 py-1 text-xs font-mono rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100" placeholder="#hex" />
+                              {(col.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb']).length > 2 && (
+                                <button type="button" onClick={() => { const c = (col.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb']).filter((_, j) => j !== i); actions.setColumnBackgroundGradient(sectionId, col.id, { ...col.backgroundGradient, colors: c }); }} className="p-1 rounded text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-600" aria-label="Remove">×</button>
+                              )}
+                            </div>
+                          ))}
+                          <button type="button" onClick={() => { const cur = col.backgroundGradient?.colors ?? ['#ffffff', '#e5e7eb']; const last = cur[cur.length - 1] ?? '#e5e7eb'; actions.setColumnBackgroundGradient(sectionId, col.id, { ...col.backgroundGradient, colors: [...cur, last] }); }} className="text-[10px] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 rounded px-2 py-0.5 hover:bg-slate-50 dark:hover:bg-slate-600">+ Add color</button>
+                        </div>
+                      </>
+                    )}
+                    {(col.backgroundType ?? 'color') === 'image' && (
+                      <>
+                        <div>
+                          <label className="block text-[10px] text-slate-500 dark:text-slate-400 mb-0.5">Image URL</label>
+                          <input type="text" value={col.backgroundImageUrl ?? ''} onChange={e => actions.setColumnBackgroundImage(sectionId, col.id, e.target.value, col.backgroundImageSize, col.backgroundImagePosition)} className="w-full px-2 py-1 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400" placeholder="https://..." />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-slate-500 dark:text-slate-400 mb-0.5">Size</label>
+                          <select value={col.backgroundImageSize ?? 'cover'} onChange={e => actions.setColumnBackgroundImage(sectionId, col.id, col.backgroundImageUrl ?? '', e.target.value as 'cover' | 'contain' | 'auto', col.backgroundImagePosition)} className="w-full px-2 py-1 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100">
+                            <option value="cover">Cover</option>
+                            <option value="contain">Contain</option>
+                            <option value="auto">Auto</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-slate-500 dark:text-slate-400 mb-0.5">Position</label>
+                          <input type="text" value={col.backgroundImagePosition ?? 'center'} onChange={e => actions.setColumnBackgroundImage(sectionId, col.id, col.backgroundImageUrl ?? '', col.backgroundImageSize, e.target.value)} className="w-full px-2 py-1 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400" placeholder="center" />
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-slate-500 dark:text-slate-400 mb-1">Height</label>
+                    <select value={col.height === 'fit-content' ? 'fit-content' : col.height && col.height !== 'auto' ? 'custom' : 'auto'} onChange={e => { const v = e.target.value; actions.setColumnHeight(sectionId, col.id, v === 'custom' ? (col.height && col.height !== 'auto' && col.height !== 'fit-content' ? col.height : '200px') : v); }} className="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900 mb-1.5">
+                      <option value="auto">Auto</option>
+                      <option value="fit-content">Fit content</option>
+                      <option value="custom">Custom</option>
+                    </select>
+                    {(col.height && col.height !== 'auto' && col.height !== 'fit-content') && (
+                      <input type="text" value={col.height} onChange={e => actions.setColumnHeight(sectionId, col.id, e.target.value)} className="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900" placeholder="200px, 100%" />
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-slate-500 dark:text-slate-400 mb-1">Border radius</label>
+                    <input type="text" value={col.borderRadius ?? ''} onChange={e => actions.setColumnBorderRadius(sectionId, col.id, e.target.value)} className="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900" placeholder="0, 8px, 12px" />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-slate-500 dark:text-slate-400 mb-1">Padding</label>
+                    <input type="text" value={col.padding ?? ''} onChange={e => actions.setColumnPadding(sectionId, col.id, e.target.value)} className="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900" placeholder="16px, 16px 24px, 5px 10px 15px" />
+                  </div>
                 </div>
               ))}
             </div>
