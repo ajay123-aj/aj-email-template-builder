@@ -1,4 +1,4 @@
-export type BlockType = 'text' | 'heading' | 'image' | 'button' | 'divider' | 'spacer' | 'social' | 'columns' | 'header' | 'footer' | 'html' | 'table' | 'list';
+export type BlockType = 'text' | 'heading' | 'image' | 'button' | 'divider' | 'spacer' | 'social' | 'columns' | 'header' | 'footer' | 'html' | 'table' | 'list' | 'section';
 export interface BaseBlock<T extends BlockType = BlockType, C = object> { id: string; type: T; config: C; }
 export interface TextConfig {
   content: string;
@@ -56,7 +56,12 @@ export interface ListConfig {
   fontSize?: string;
   color?: string;
 }
-export type AnyBlock = BaseBlock<'text', TextConfig> | BaseBlock<'heading', HeadingConfig> | BaseBlock<'image', ImageConfig> | BaseBlock<'button', ButtonConfig> | BaseBlock<'divider', DividerConfig> | BaseBlock<'spacer', SpacerConfig> | BaseBlock<'social', SocialConfig> | BaseBlock<'columns', ColumnsConfig> | BaseBlock<'header', HeaderConfig> | BaseBlock<'footer', FooterConfig> | BaseBlock<'html', HtmlConfig> | BaseBlock<'table', TableConfig> | BaseBlock<'list', ListConfig>;
+/** Section block - starts a new design section within a column. Subsequent blocks are wrapped with this config until next section. */
+export interface SectionConfig extends BackgroundOptions {
+  padding?: string;
+  margin?: string;
+}
+export type AnyBlock = BaseBlock<'text', TextConfig> | BaseBlock<'heading', HeadingConfig> | BaseBlock<'image', ImageConfig> | BaseBlock<'button', ButtonConfig> | BaseBlock<'divider', DividerConfig> | BaseBlock<'spacer', SpacerConfig> | BaseBlock<'social', SocialConfig> | BaseBlock<'columns', ColumnsConfig> | BaseBlock<'header', HeaderConfig> | BaseBlock<'footer', FooterConfig> | BaseBlock<'html', HtmlConfig> | BaseBlock<'table', TableConfig> | BaseBlock<'list', ListConfig> | BaseBlock<'section', SectionConfig>;
 export interface EmailColumn { id: string; width?: string; blocks: AnyBlock[]; }
 export type SectionLayout = 'row' | 'column';
 
@@ -74,5 +79,19 @@ export interface BackgroundOptions {
   backgroundImagePosition?: string;
 }
 
-export interface EmailSection extends BackgroundOptions { id: string; layout?: SectionLayout; padding?: string; margin?: string; columns: EmailColumn[]; }
+export type ColumnSeparatorType = 'none' | 'border' | 'line';
+
+export interface EmailSection extends BackgroundOptions {
+  id: string;
+  layout?: SectionLayout;
+  padding?: string;
+  margin?: string;
+  columns: EmailColumn[];
+  /** Gap between columns (e.g. "0", "8px", "16px") */
+  columnGap?: string;
+  /** Visual separator between columns */
+  columnSeparator?: ColumnSeparatorType;
+  /** Color for the column separator (e.g. "#e5e7eb") */
+  columnSeparatorColor?: string;
+}
 export interface EmailTemplate extends BackgroundOptions { id: string; name?: string; width?: string; padding?: string; sections: EmailSection[]; }

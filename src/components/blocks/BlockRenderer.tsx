@@ -136,6 +136,10 @@ export function BlockRenderer({ block, selected, onPatch }: Props) {
         </div>
       );
     }
+    case 'section':
+      return (
+        <div className="h-1 rounded bg-slate-300 dark:bg-slate-500/60 border border-dashed border-slate-300 dark:border-slate-600" aria-label="Section" />
+      );
     case 'list': {
       const items = (c.items as string[]) ?? ['Item 1', 'Item 2'];
       const listType = (c.listType as 'ul' | 'ol') ?? 'ul';

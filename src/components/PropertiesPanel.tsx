@@ -1,7 +1,7 @@
 import { useEditorStore, actions } from '../store/useEditorStore';
 import { ConfirmTooltip } from './ConfirmTooltip';
 import { BlockIcon, IconColumns, IconProperties } from './icons';
-import type { AnyBlock, BackgroundType, ButtonBackgroundType, DividerBorderType } from '../types/template';
+import type { AnyBlock, BackgroundType, ButtonBackgroundType, DividerBorderType, ColumnSeparatorType } from '../types/template';
 
 function BlockBackgroundFields({ config, update }: { config: Record<string, unknown>; update: (key: string, value: unknown) => void }) {
   const type = (config.backgroundType ?? (config.backgroundColor ? 'color' : 'color')) as BackgroundType;
@@ -232,11 +232,23 @@ function SectionProps({ sectionId }: { sectionId: string }) {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <div className="flex-shrink-0 px-4 py-4 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-        <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white"><IconColumns /></div>
-          <div className="min-w-0">
-            <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">Section</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">Layout, padding, background, columns.</p>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3 min-w-0">
+            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white"><IconColumns /></div>
+            <div className="min-w-0">
+              <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">Section</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">Layout, padding, background, columns.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            <button type="button" className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-600" onClick={() => actions.duplicateSection(sectionId)} title="Copy section" aria-label="Copy section">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+            </button>
+            <ConfirmTooltip message="Remove this section?" onConfirm={() => actions.removeSection(sectionId)} placement="bottom">
+              <button type="button" className="p-1.5 rounded-lg border border-red-200 dark:border-red-800 text-red-600 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/50" title="Remove section" aria-label="Remove section">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+              </button>
+            </ConfirmTooltip>
           </div>
         </div>
       </div>
@@ -258,23 +270,44 @@ function SectionProps({ sectionId }: { sectionId: string }) {
       </div>
       <SectionBackgroundFields sectionId={sectionId} />
       {multiColumn && (
-        <div>
-          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Column widths</label>
-          <div className="space-y-2">
-            {section.columns.map((col, i) => (
-              <div key={col.id} className="flex items-center gap-2">
-                <span className="text-xs text-slate-500 dark:text-slate-400 w-8">Col {i + 1}</span>
-                <input type="text" value={col.width ?? ''} onChange={e => actions.setColumnWidth(sectionId, col.id, e.target.value)} className="flex-1 px-2 py-1.5 text-sm rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-500" placeholder="e.g. 50%" />
-              </div>
-            ))}
+        <>
+          <div>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Column widths</label>
+            <div className="space-y-2">
+              {section.columns.map((col, i) => (
+                <div key={col.id} className="flex items-center gap-2">
+                  <span className="text-xs text-slate-500 dark:text-slate-400 w-8">Col {i + 1}</span>
+                  <input type="text" value={col.width ?? ''} onChange={e => actions.setColumnWidth(sectionId, col.id, e.target.value)} className="flex-1 px-2 py-1.5 text-sm rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-500" placeholder="e.g. 50%" />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+          <div>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Column gap</label>
+            <div className="flex flex-wrap gap-1">
+              {['0', '8px', '12px', '16px', '24px', '32px'].map(g => (
+                <button key={g} type="button" onClick={() => actions.setSectionColumnGap(sectionId, g)} className={`px-2 py-1 text-xs rounded border ${(section.columnGap ?? '8px') === g ? 'border-blue-500 bg-blue-100 dark:bg-blue-700/50 text-blue-700 dark:text-blue-200' : 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600'}`}>{g}</button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Column separator</label>
+            <div className="flex flex-wrap gap-1">
+              {(['none', 'border', 'line'] as ColumnSeparatorType[]).map(sep => (
+                <button key={sep} type="button" onClick={() => actions.setSectionColumnSeparator(sectionId, sep)} className={`px-2 py-1 text-xs rounded border capitalize ${(section.columnSeparator ?? 'none') === sep ? 'border-blue-500 bg-blue-100 dark:bg-blue-700/50 text-blue-700 dark:text-blue-200' : 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600'}`}>{sep}</button>
+              ))}
+            </div>
+          </div>
+          {section.columnSeparator && section.columnSeparator !== 'none' && (
+            <div>
+              <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Separator color</label>
+              <input type="color" value={section.columnSeparatorColor ?? '#e5e7eb'} onChange={e => actions.setSectionColumnSeparatorColor(sectionId, e.target.value)} className="w-full h-8 rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 cursor-pointer" />
+            </div>
+          )}
+        </>
       )}
-      <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-700">
+      <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
         <button type="button" onClick={() => actions.addColumnToSection(sectionId)} className="px-4 py-2 text-sm font-semibold rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 shadow-sm">+ Add column</button>
-        <ConfirmTooltip message="Remove this section?" onConfirm={() => actions.removeSection(sectionId)} placement="bottom">
-          <button type="button" className="px-4 py-2 text-sm font-semibold rounded-xl border border-red-800 text-red-300 hover:bg-red-900/50">Remove section</button>
-        </ConfirmTooltip>
       </div>
       </div>
     </div>
@@ -346,9 +379,16 @@ function BlockProps({ block }: { block: AnyBlock }) {
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Edit block settings</p>
             </div>
           </div>
-          <ConfirmTooltip message="Remove this block?" onConfirm={() => actions.deleteBlock(block.id)} placement="bottom">
-            <button type="button" className="flex-shrink-0 px-3 py-1.5 text-xs font-semibold rounded-lg border border-red-800 text-red-300 hover:bg-red-900/50 transition-colors">Remove</button>
-          </ConfirmTooltip>
+          <div className="flex items-center gap-1 shrink-0">
+            <button type="button" className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-600" onClick={() => actions.duplicateBlock(block.id)} title="Copy block" aria-label="Copy block">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+            </button>
+            <ConfirmTooltip message="Remove this block?" onConfirm={() => actions.deleteBlock(block.id)} placement="bottom">
+              <button type="button" className="p-1.5 rounded-lg border border-red-200 dark:border-red-800 text-red-600 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/50" title="Remove block" aria-label="Remove block">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+              </button>
+            </ConfirmTooltip>
+          </div>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/30 dark:bg-slate-800/50">
@@ -532,6 +572,22 @@ function BlockProps({ block }: { block: AnyBlock }) {
           <div className="grid grid-cols-2 gap-2">
             <div><label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Border color</label><input type="color" value={String(c.borderColor ?? '#e5e7eb')} onChange={e => update('borderColor', e.target.value)} className="w-full h-8 rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-500 cursor-pointer" /></div>
             <div><label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Font size</label><input type="text" value={String(c.fontSize ?? '14px')} onChange={e => update('fontSize', e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-500" /></div>
+          </div>
+        </>
+      )}
+      {block.type === 'section' && (
+        <>
+          <div>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Padding</label>
+            <input type="text" value={String(c.padding ?? '16px')} onChange={e => update('padding', e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-500" placeholder="16px" />
+          </div>
+          <div>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Margin</label>
+            <input type="text" value={String(c.margin ?? '0')} onChange={e => update('margin', e.target.value)} className="w-full px-2 py-1.5 text-sm rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-500" placeholder="0 or 16px 0" />
+          </div>
+          <div>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1 font-medium">Background</label>
+            <BlockBackgroundFields config={c} update={update} />
           </div>
         </>
       )}

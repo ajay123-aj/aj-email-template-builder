@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { v4 as uuid } from 'uuid';
-import type { AnyBlock, EmailColumn, EmailSection, EmailTemplate, SectionLayout, BackgroundType, BackgroundGradient } from '../types/template';
+import type { AnyBlock, EmailColumn, EmailSection, EmailTemplate, SectionLayout, BackgroundType, BackgroundGradient, ColumnSeparatorType } from '../types/template';
 
 const createColumn = (): EmailColumn => ({ id: uuid(), width: '100%', blocks: [] });
 const createSection = (n: number, layout: SectionLayout = 'row'): EmailSection => {
@@ -96,6 +96,19 @@ export const actions = {
     const { template } = getState();
     setState({ template: { ...template, sections: template.sections.filter(s => s.id !== id) }, selectedSectionId: getState().selectedSectionId === id ? null : getState().selectedSectionId });
   },
+  duplicateSection: (id: string) => {
+    actions.pushHistory();
+    const { template } = getState();
+    const idx = template.sections.findIndex(s => s.id === id);
+    if (idx < 0) return;
+    const orig = template.sections[idx];
+    const clone: EmailSection = JSON.parse(JSON.stringify(orig));
+    clone.id = uuid();
+    clone.columns = clone.columns.map(c => ({ ...c, id: uuid(), blocks: c.blocks.map(b => ({ ...b, id: uuid() })) }));
+    const sections = [...template.sections];
+    sections.splice(idx + 1, 0, clone);
+    setState({ template: { ...template, sections }, selectedSectionId: clone.id });
+  },
   moveSection: (sectionId: string, newIndex: number) => {
     actions.pushHistory();
     const { template } = getState();
@@ -126,6 +139,9 @@ export const actions = {
   setSectionBackgroundType: (sectionId: string, t: BackgroundType) => { actions.pushHistory(); setState({ template: { ...getState().template, sections: getState().template.sections.map(s => s.id === sectionId ? { ...s, backgroundType: t } : s) } }); },
   setSectionBackgroundGradient: (sectionId: string, g: BackgroundGradient) => { actions.pushHistory(); setState({ template: { ...getState().template, sections: getState().template.sections.map(s => s.id === sectionId ? { ...s, backgroundType: 'gradient', backgroundGradient: { angle: g.angle ?? 90, colors: g.colors?.length ? g.colors : ['#ffffff', '#e5e7eb'] } } : s) } }); },
   setSectionBackgroundImage: (sectionId: string, url: string, size?: 'cover' | 'contain' | 'auto', position?: string) => { actions.pushHistory(); setState({ template: { ...getState().template, sections: getState().template.sections.map(s => s.id === sectionId ? { ...s, backgroundType: 'image', backgroundImageUrl: url, backgroundImageSize: size, backgroundImagePosition: position } : s) } }); },
+  setSectionColumnGap: (sectionId: string, gap: string) => { actions.pushHistory(); setState({ template: { ...getState().template, sections: getState().template.sections.map(s => s.id === sectionId ? { ...s, columnGap: gap } : s) } }); },
+  setSectionColumnSeparator: (sectionId: string, separator: ColumnSeparatorType) => { actions.pushHistory(); setState({ template: { ...getState().template, sections: getState().template.sections.map(s => s.id === sectionId ? { ...s, columnSeparator: separator } : s) } }); },
+  setSectionColumnSeparatorColor: (sectionId: string, color: string) => { actions.pushHistory(); setState({ template: { ...getState().template, sections: getState().template.sections.map(s => s.id === sectionId ? { ...s, columnSeparatorColor: color } : s) } }); },
   setColumnWidth: (sectionId: string, columnId: string, width: string) => {
     actions.pushHistory();
     const { template } = getState();

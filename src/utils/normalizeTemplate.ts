@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import type { AnyBlock, EmailColumn, EmailSection, EmailTemplate } from '../types/template';
 
-const VALID_BLOCK_TYPES = ['text', 'heading', 'image', 'button', 'divider', 'spacer', 'social', 'columns', 'header', 'footer', 'html', 'table', 'list'] as const;
+const VALID_BLOCK_TYPES = ['text', 'heading', 'image', 'button', 'divider', 'spacer', 'social', 'columns', 'header', 'footer', 'html', 'table', 'list', 'section'] as const;
 const VALID_BG_IMAGE_SIZES = ['cover', 'contain', 'auto'] as const;
 
 function normalizeBackgroundImageSize(v: unknown): 'cover' | 'contain' | 'auto' | undefined {
@@ -46,6 +46,7 @@ function ensureSection(sec: unknown): EmailSection | null {
     columns.push({ id: uuid(), width: '100%', blocks: [] });
   }
   const bgType = s.backgroundType === 'gradient' ? 'gradient' : s.backgroundType === 'image' ? 'image' : undefined;
+  const sep = s.columnSeparator === 'border' || s.columnSeparator === 'line' ? s.columnSeparator : undefined;
   return {
     id,
     layout: (s.layout === 'column' ? 'column' : 'row') as 'row' | 'column',
@@ -57,6 +58,9 @@ function ensureSection(sec: unknown): EmailSection | null {
     backgroundImageUrl: typeof s.backgroundImageUrl === 'string' ? s.backgroundImageUrl : undefined,
     backgroundImageSize: normalizeBackgroundImageSize(s.backgroundImageSize),
     backgroundImagePosition: typeof s.backgroundImagePosition === 'string' ? s.backgroundImagePosition : undefined,
+    columnGap: typeof s.columnGap === 'string' ? s.columnGap : undefined,
+    columnSeparator: sep,
+    columnSeparatorColor: typeof s.columnSeparatorColor === 'string' ? s.columnSeparatorColor : undefined,
     columns,
   } as EmailSection;
 }

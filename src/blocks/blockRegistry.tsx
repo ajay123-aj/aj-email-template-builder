@@ -15,11 +15,12 @@ const defaults: Record<BlockType, object> = {
   html: { html: '<p>HTML</p>' },
   table: { headers: ['Header 1', 'Header 2', 'Header 3'], rows: [['Cell 1', 'Cell 2', 'Cell 3'], ['Cell 4', 'Cell 5', 'Cell 6']], borderColor: '#e5e7eb', fontSize: '14px', alignment: 'left' },
   list: { items: ['Item 1', 'Item 2', 'Item 3'], listType: 'ul', fontSize: '14px', color: '#374151' },
+  section: { backgroundType: 'color', backgroundColor: '#f9fafb', padding: '16px', margin: '0' },
 };
 
 export function createBlock(type: BlockType): AnyBlock {
   return { id: uuid(), type, config: { ...defaults[type] } } as AnyBlock;
 }
 
-export const BLOCK_LABELS: Record<BlockType, string> = { text: 'Text', heading: 'Heading', image: 'Image', button: 'Button', divider: 'Divider', spacer: 'Spacer', social: 'Social', columns: 'Columns', header: 'Header', footer: 'Footer', html: 'HTML', table: 'Table', list: 'List' };
-export const PALETTE_ORDER: BlockType[] = ['header', 'text', 'heading', 'image', 'button', 'table', 'list', 'divider', 'spacer', 'social', 'columns', 'footer', 'html'];
+export const BLOCK_LABELS: Record<BlockType, string> = { text: 'Text', heading: 'Heading', image: 'Image', button: 'Button', divider: 'Divider', spacer: 'Spacer', social: 'Social', columns: 'Columns', header: 'Header', footer: 'Footer', html: 'HTML', table: 'Table', list: 'List', section: 'Section' };
+export const PALETTE_ORDER: BlockType[] = ['header', 'text', 'heading', 'image', 'button', 'table', 'list', 'divider', 'spacer', 'social', 'section', 'columns', 'footer', 'html'];

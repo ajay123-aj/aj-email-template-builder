@@ -2,6 +2,32 @@ import type { EmailTemplate, AnyBlock } from '../types/template';
 import { getBackgroundStyle, getButtonBackgroundStyle, getDividerBorderStyle } from './backgroundStyle';
 import { paddingBlockToCss, isPaddingZero } from './paddingUtils';
 
+/** Split column blocks into groups by section markers. */
+function splitIntoSectionGroups(blocks: AnyBlock[]): { sectionBlock: AnyBlock | null; contentBlocks: AnyBlock[] }[] {
+  const out: { sectionBlock: AnyBlock | null; contentBlocks: AnyBlock[] }[] = [];
+  let i = 0;
+  while (i < blocks.length) {
+    if (blocks[i].type === 'section') {
+      const sectionBlock = blocks[i];
+      const contentBlocks: AnyBlock[] = [];
+      i++;
+      while (i < blocks.length && blocks[i].type !== 'section') {
+        contentBlocks.push(blocks[i]);
+        i++;
+      }
+      out.push({ sectionBlock, contentBlocks });
+    } else {
+      const contentBlocks: AnyBlock[] = [];
+      while (i < blocks.length && blocks[i].type !== 'section') {
+        contentBlocks.push(blocks[i]);
+        i++;
+      }
+      if (contentBlocks.length) out.push({ sectionBlock: null, contentBlocks });
+    }
+  }
+  return out;
+}
+
 function esc(s: string) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 function contentToHtml(content: string | undefined): string {
   const raw = (content ?? '').replace(/<br\s*\/?>/gi, '\n');
@@ -97,12 +123,27 @@ function blockHtml(b: AnyBlock): string {
       const cells = widths.slice(0, count).map(w => `<td width="${w}" valign="top" style="padding:8px;vertical-align:top"></td>`).join('');
       return `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse"><tr>${cells}</tr></table>`;
     }
+    case 'section':
+      return '';
     default:
       return '';
   }
 }
 
-function colHtml(blocks: AnyBlock[]) { return blocks.map(blockHtml).join(''); }
+function colHtml(blocks: AnyBlock[]): string {
+  const groups = splitIntoSectionGroups(blocks);
+  return groups.map(g => {
+    const inner = g.contentBlocks.map(blockHtml).join('');
+    if (g.sectionBlock) {
+      const c = g.sectionBlock.config as Record<string, unknown>;
+      const pad = paddingBlockToCss((c.padding as string) ?? '16px', '16px');
+      const margin = ((c.margin as string) ?? '0').trim() || '0';
+      const bg = getBackgroundStyle(c);
+      return `<div style="padding:${pad};margin:${margin};background:${bg}">${inner}</div>`;
+    }
+    return inner;
+  }).join('');
+}
 
 const RESPONSIVE_STYLE = `
   html, body { height: auto !important; min-height: 0 !important; }
@@ -136,7 +177,14 @@ export function exportToEmailHtml(template: EmailTemplate): string {
     }
     const n = section.columns.length;
     const widths = section.columns.map(c => (!c.width || c.width === 'auto' || c.width === '100%') ? `${100 / n}%` : c.width);
-    const cols = section.columns.map((col, i) => `<td class="email-section-row" width="${widths[i]}" valign="top" style="padding:8px">${colHtml(col.blocks)}</td>`).join('');
+    const gap = section.columnGap ?? '8px';
+    const separator = section.columnSeparator ?? 'none';
+    const sepColor = section.columnSeparatorColor ?? '#e5e7eb';
+    const sepStyle = separator === 'line' ? `1px solid ${sepColor}` : separator === 'border' ? `2px solid ${sepColor}` : 'none';
+    const cols = section.columns.map((col, i) => {
+      const border = i > 0 && separator !== 'none' ? `;border-left:${sepStyle}` : '';
+      return `<td class="email-section-row" width="${widths[i]}" valign="top" style="padding:${gap}${border}">${colHtml(col.blocks)}</td>`;
+    }).join('');
     return `<tr><td style="padding:0;vertical-align:top"><div class="email-section-inner${noPadClass}" style="${innerStyle}"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>${cols}</tr></table></div></td></tr>`;
   }).join('');
 

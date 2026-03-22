@@ -4,16 +4,41 @@ import { useDroppable } from '@dnd-kit/core';
 
 const EMPTY_CANVAS_DROP_ID = 'empty-canvas';
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
-import { ConfirmTooltip } from './ConfirmTooltip';
 import { CSS } from '@dnd-kit/utilities';
 import { BlockWrapper } from './blocks/BlockWrapper';
-import { IconAddRow, IconColumns, IconLayoutRow } from './icons';
+import { IconAddRow, IconColumns } from './icons';
 import { useEditorStore, actions } from '../store/useEditorStore';
 import { getBackgroundStyle } from '../utils/backgroundStyle';
 import { paddingBlockToStyle } from '../utils/paddingUtils';
-import type { EmailSection, EmailColumn, AnyBlock } from '../types/template';
+import type { EmailSection, EmailColumn, AnyBlock, SectionConfig } from '../types/template';
 
 const dropId = (sId: string, cId: string) => `drop:${sId}:${cId}`;
+
+/** Split column blocks into groups by section markers. Each group has a section block (or null) and the blocks to render. */
+function splitIntoSectionGroups(blocks: AnyBlock[]): { sectionBlock: AnyBlock | null; blocksInGroup: AnyBlock[] }[] {
+  const out: { sectionBlock: AnyBlock | null; blocksInGroup: AnyBlock[] }[] = [];
+  let i = 0;
+  while (i < blocks.length) {
+    if (blocks[i].type === 'section') {
+      const sectionBlock = blocks[i];
+      const blocksInGroup: AnyBlock[] = [sectionBlock];
+      i++;
+      while (i < blocks.length && blocks[i].type !== 'section') {
+        blocksInGroup.push(blocks[i]);
+        i++;
+      }
+      out.push({ sectionBlock, blocksInGroup });
+    } else {
+      const blocksInGroup: AnyBlock[] = [];
+      while (i < blocks.length && blocks[i].type !== 'section') {
+        blocksInGroup.push(blocks[i]);
+        i++;
+      }
+      if (blocksInGroup.length) out.push({ sectionBlock: null, blocksInGroup });
+    }
+  }
+  return out;
+}
 const SECTION_PREFIX = 'section:';
 export const sectionDndId = (id: string) => SECTION_PREFIX + id;
 export const parseSectionDndId = (id: string) => id.startsWith(SECTION_PREFIX) ? id.slice(SECTION_PREFIX.length) : null;
@@ -38,7 +63,7 @@ function BlockItem({ block, sectionId, columnId, index, sectionSelected }: { blo
   );
 }
 
-function ColumnZone({ sectionId, columnId, column, section, children }: { sectionId: string; columnId: string; column: EmailColumn; section: EmailSection; children: React.ReactNode }) {
+function ColumnZone({ sectionId, columnId, column, section, columnIndex, children }: { sectionId: string; columnId: string; column: EmailColumn; section: EmailSection; columnIndex: number; children: React.ReactNode }) {
   const { setNodeRef, isOver } = useDroppable({ id: dropId(sectionId, columnId) });
   const dragOverId = useEditorStore(s => s.dragOverId);
   const dragOverPosition = useEditorStore(s => s.dragOverPosition);
@@ -48,11 +73,17 @@ function ColumnZone({ sectionId, columnId, column, section, children }: { sectio
   const isRow = section.layout !== 'column';
   const n = section.columns.length;
   const useAuto = isRow && n > 1 && (!column.width || column.width === 'auto' || column.width === '100%');
-  const style: React.CSSProperties = section.layout === 'column'
-    ? { width: '100%' }
-    : useAuto
-      ? { flex: '1 1 0', minWidth: 0 }
-      : { flexBasis: column.width, width: column.width };
+  const separator = section.columnSeparator ?? 'none';
+  const sepColor = section.columnSeparatorColor ?? '#e5e7eb';
+  const showSeparator = isRow && n > 1 && columnIndex > 0 && separator !== 'none';
+  const style: React.CSSProperties = {
+    ...(section.layout === 'column'
+      ? { width: '100%' }
+      : useAuto
+        ? { flex: '1 1 0', minWidth: 0 }
+        : { flexBasis: column.width, width: column.width }),
+    ...(showSeparator && { borderLeft: `${separator === 'line' ? '1px' : '2px'} solid ${sepColor}` }),
+  };
   return (
     <div ref={setNodeRef} style={style} className={`min-h-[48px] flex flex-col min-w-0 ${isOver ? 'ring-2 ring-inset ring-blue-400 dark:ring-blue-500 bg-blue-50/30 dark:bg-blue-900/30' : ''}`}>
       {showLineTop && <InsertionLine />}
@@ -62,7 +93,7 @@ function ColumnZone({ sectionId, columnId, column, section, children }: { sectio
   );
 }
 
-function SortableSection({ section, index }: { section: EmailSection; index: number }) {
+function SortableSection({ section, index: _index }: { section: EmailSection; index: number }) {
   const selected = useEditorStore(s => s.selectedSectionId) === section.id;
   const selectedBlockId = useEditorStore(s => s.selectedBlockId);
   const dragOverId = useEditorStore(s => s.dragOverId);
@@ -82,7 +113,6 @@ function SortableSection({ section, index }: { section: EmailSection; index: num
     background: getBackgroundStyle(section),
     ...(transform ? { transform: CSS.Transform.toString(transform), transition } : {}),
   };
-  const showToolbar = selected || isDragging;
   return (
     <>
       {showLineTop && <InsertionLine />}
@@ -98,51 +128,50 @@ function SortableSection({ section, index }: { section: EmailSection; index: num
       className={`relative transition-all duration-200 group overflow-hidden ${selected ? 'ring-2 ring-blue-500 ring-offset-2 shadow-md' : 'ring-1 ring-slate-200/80 dark:ring-slate-500/80 hover:ring-slate-300 dark:hover:ring-slate-400 hover:shadow-sm'} ${isDragging ? 'opacity-90 shadow-xl z-50 scale-[1.02]' : ''}`}
       style={innerStyle}
     >
-      {/* Section header toolbar - visible on hover or when selected */}
-      <div
-        data-section-menu
-        className={`absolute top-0 left-0 right-0 flex items-center justify-between gap-2 px-3 py-1.5 z-20 transition-opacity duration-200 ${
-          showToolbar ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto'
-        }`}
-        style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.06) 0%, transparent 100%)' }}
-      >
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs font-medium text-slate-600 dark:text-slate-200 px-2 py-0.5 rounded-md bg-white/80 dark:bg-slate-800/90 shadow-sm">Section {index + 1}</span>
+      {/* Section drag handle - only when section selected and no block selected */}
+      {selected && !sectionHasSelectedBlock && (
+        <div data-section-menu className="absolute top-1 right-1 z-30">
           <button
             type="button"
-            className={`p-1.5 rounded-lg transition-colors ${layout === 'row' ? 'bg-blue-100 dark:bg-blue-600/90 text-blue-700 dark:text-white' : 'bg-slate-100 dark:bg-slate-700/90 text-slate-500 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'}`}
-            onClick={e => { e.stopPropagation(); actions.setSectionLayout(section.id, 'row'); }}
-            title="Row layout (side by side)"
+            className="flex items-center justify-center w-6 h-6 rounded-md bg-white/95 dark:bg-slate-700/95 shadow-sm border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-600 cursor-grab active:cursor-grabbing touch-manipulation"
+            {...listeners}
+            {...attributes}
+            title="Drag to reorder"
+            aria-label="Drag to reorder section"
           >
-            <IconLayoutRow />
-          </button>
-          <button
-            type="button"
-            className={`p-1.5 rounded-lg transition-colors ${layout === 'column' ? 'bg-blue-100 dark:bg-blue-600/90 text-blue-700 dark:text-white' : 'bg-slate-100 dark:bg-slate-700/90 text-slate-500 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'}`}
-            onClick={e => { e.stopPropagation(); actions.setSectionLayout(section.id, 'column'); }}
-            title="Column layout"
-          >
-            <IconColumns />
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 6h2v2H8V6zm0 5h2v2H8v-2zm0 5h2v2H8v-2zm5-10h2v2h-2V6zm0 5h2v2h-2v-2zm0 5h2v2h-2v-2z" /></svg>
           </button>
         </div>
-        <div className="flex items-center gap-1">
-          <button type="button" className="p-1.5 rounded-lg bg-white/90 dark:bg-slate-700/90 shadow-sm text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-600 cursor-grab active:cursor-grabbing touch-manipulation" {...listeners} {...attributes} title="Drag to reorder">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 6h2v2H8V6zm0 5h2v2H8v-2zm0 5h2v2H8v-2zm5-10h2v2h-2V6zm0 5h2v2h-2v-2zm0 5h2v2h-2v-2z" /></svg>
-          </button>
-          <ConfirmTooltip message="Remove this section?" onConfirm={() => actions.removeSection(section.id)} placement="bottom">
-            <button type="button" className="p-1.5 rounded-lg bg-red-50 dark:bg-red-900/80 text-red-600 dark:text-red-200 hover:bg-red-100 dark:hover:bg-red-800 shadow-sm" title="Remove section">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-            </button>
-          </ConfirmTooltip>
-        </div>
-      </div>
-      <div className="flex gap-2 min-w-0" style={{ flexDirection: layout === 'column' ? 'column' : 'row' }}>
-        {section.columns.map(col => (
-          <ColumnZone key={col.id} sectionId={section.id} columnId={col.id} column={col} section={section}>
+      )}
+      <div className="flex min-w-0" style={{ flexDirection: layout === 'column' ? 'column' : 'row', gap: section.columnGap ?? '8px' }}>
+        {section.columns.map((col, idx) => (
+          <ColumnZone key={col.id} sectionId={section.id} columnId={col.id} column={col} section={section} columnIndex={idx}>
             <SortableContext items={col.blocks.map(b => b.id)} strategy={verticalListSortingStrategy}>
-              {col.blocks.map((block, idx) => (
-                <BlockItem key={block.id} block={block} sectionId={section.id} columnId={col.id} index={idx} sectionSelected={selected && !sectionHasSelectedBlock} />
-              ))}
+              {splitIntoSectionGroups(col.blocks).map(g => {
+                const sectionStyle: React.CSSProperties | undefined = g.sectionBlock
+                  ? (() => {
+                      const sc = g.sectionBlock.config as SectionConfig;
+                      return {
+                        background: getBackgroundStyle(sc),
+                        ...paddingBlockToStyle(sc.padding, '16px'),
+                        margin: (sc.margin ?? '').trim() || '0',
+                      };
+                    })()
+                  : undefined;
+                const inner = g.blocksInGroup.map(block => {
+                  const idx = col.blocks.findIndex(b => b.id === block.id);
+                  return (
+                    <BlockItem key={block.id} block={block} sectionId={section.id} columnId={col.id} index={idx} sectionSelected={selected && !sectionHasSelectedBlock} />
+                  );
+                });
+                return g.sectionBlock && sectionStyle ? (
+                  <div key={g.sectionBlock.id} className="rounded mb-3" style={sectionStyle}>
+                    {inner}
+                  </div>
+                ) : (
+                  <React.Fragment key={g.blocksInGroup[0]?.id ?? 'unwrap'}>{inner}</React.Fragment>
+                );
+              })}
               {col.blocks.length === 0 && (
                 <div className="min-h-[72px] flex flex-col items-center justify-center py-6 px-4 border-2 border-dashed border-slate-200 dark:border-slate-500 bg-slate-50/50 dark:bg-slate-800/30 text-slate-500 dark:text-slate-400 text-sm transition-colors hover:border-blue-300 dark:hover:border-blue-500 hover:bg-blue-50/30 dark:hover:bg-blue-900/20">
                   <svg className="w-8 h-8 mb-2 text-slate-300 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>

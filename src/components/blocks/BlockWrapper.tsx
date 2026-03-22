@@ -19,10 +19,10 @@ export function BlockWrapper({ block, sectionId, columnId, index, isOverlay, sec
     <div ref={setNodeRef} style={style} onClick={e => { e.stopPropagation(); actions.selectBlock(block.id); actions.selectSection(sectionId); }}
       className={`relative rounded transition-all group ${selected ? 'ring-2 ring-inset ring-blue-500' : 'ring-2 ring-inset ring-transparent hover:ring-slate-400'} ${isDragging ? 'opacity-80 shadow-lg z-50' : ''}`}>
       {showBlockMenu && (
-        <div className="absolute top-1 right-1 flex items-center gap-0.5 z-10">
-          <button type="button" className="px-1.5 py-0.5 text-xs rounded bg-slate-700/90 text-white shadow hover:bg-slate-600 cursor-grab active:cursor-grabbing touch-manipulation" {...listeners} {...attributes} title="Drag">⋮⋮</button>
-          <button type="button" className="px-1.5 py-0.5 text-xs rounded bg-slate-600/90 text-white hover:bg-slate-500" onClick={e => { e.stopPropagation(); actions.duplicateBlock(block.id); }}>Copy</button>
-          <button type="button" className="px-1.5 py-0.5 text-xs rounded bg-red-600/90 text-white hover:bg-red-500" onClick={e => { e.stopPropagation(); actions.deleteBlock(block.id); }}>×</button>
+        <div className="absolute top-1 right-1 flex items-center z-10 shrink-0">
+          <button type="button" className="p-1 rounded bg-slate-700/90 text-white shadow hover:bg-slate-600 cursor-grab active:cursor-grabbing touch-manipulation" {...listeners} {...attributes} title="Drag" aria-label="Drag">
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 6h2v2H8V6zm0 5h2v2H8v-2zm0 5h2v2H8v-2zm5-10h2v2h-2V6zm0 5h2v2h-2v-2zm0 5h2v2h-2v-2z" /></svg>
+          </button>
         </div>
       )}
       <div className={`min-h-[24px] ${!isOverlay ? 'p-1' : 'p-2'}`}><BlockRenderer block={block} selected={selected} onPatch={onPatch} /></div>
