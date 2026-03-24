@@ -9,6 +9,10 @@ interface ImportMetaEnv {
   readonly VITE_SEND_EMAIL_API_URL?: string;
   /** Base URL for SEO (canonical, OG, sitemap). e.g. https://yourdomain.com */
   readonly VITE_SITE_URL?: string;
+  /** API origin for AJ Email Editor lead collect, e.g. http://localhost:3001 (no path). If unset, collect is skipped. */
+  readonly VITE_LEAD_COLLECT_API_ORIGIN?: string;
+  /** Optional path prefix before /api, e.g. /api-backend (matches server API_PREFIX). */
+  readonly VITE_API_PREFIX?: string;
 }
 
 interface ImportMeta {

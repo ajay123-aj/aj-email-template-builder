@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "restart": "npx --yes kill-port 5173 & vite",
+    "restart": "npx --yes kill-port 5000 & vite",
     "prebuild": "node scripts/replace-site-url.js",
     "build": "tsc -b && vite build",
     "preview": "vite preview"
