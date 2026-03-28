@@ -1,3 +1,4 @@
+import { getAjEmailEditorApiUrl } from './ajBackendUrl';
 import { getOrCreateDeviceId } from './deviceId';
 
 const LIFETIME_OPENS_KEY = 'aj-email-editor:lifetime-open-count';
@@ -21,18 +22,8 @@ function tryAcquireLeadCollectSlot(): boolean {
   }
 }
 
-function normalizeApiPrefix(raw: string): string {
-  const t = raw.trim();
-  if (!t) return '';
-  return t.startsWith('/') ? t : `/${t}`;
-}
-
 export function getLeadCollectEndpointUrl(): string | null {
-  const origin = (import.meta.env.VITE_LEAD_COLLECT_API_ORIGIN as string | undefined)?.trim();
-  if (!origin) return null;
-  const base = origin.replace(/\/$/, '');
-  const prefix = normalizeApiPrefix((import.meta.env.VITE_API_PREFIX as string | undefined) ?? '');
-  return `${base}${prefix}/api/aj-email-editor/leads/collect`;
+  return getAjEmailEditorApiUrl('leads/collect');
 }
 
 /**

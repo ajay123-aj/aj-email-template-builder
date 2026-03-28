@@ -41,6 +41,12 @@ export function Header() {
               </a>
             </>
           )}
+          <Link
+            to="/contact"
+            className="px-3 py-2 text-xs sm:text-sm font-medium text-slate-300 hover:text-white transition-colors rounded-lg hover:bg-white/5"
+          >
+            Contact
+          </Link>
           <button
             type="button"
             className="px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:scale-105"

@@ -45,6 +45,12 @@ export function Footer() {
             >
               AJ Email Editor
             </Link>
+            <Link
+              to="/contact"
+              className="text-sm text-slate-400 hover:text-white transition-colors"
+            >
+              Contact
+            </Link>
             <span className="text-slate-400 text-sm">
               © {currentYear} AJ Technology. All rights reserved.
             </span>
